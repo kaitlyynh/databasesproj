@@ -1,10 +1,9 @@
-from market import app
+from lookup import app
 from flask import render_template, redirect, url_for, flash
-from market.models import Item, User
-from market.forms import RegisterForm, LoginForm,  FullNameForm
-from market import db
+from lookup.models import Item, User
+from lookup.forms import RegisterForm, LoginForm,  FullNameForm
+from lookup import db
 from flask_login import login_user, logout_user, login_required
-
 
 
 @app.route('/')
@@ -68,7 +67,9 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-
+@app.route('/sql')
+def sql_page():
+    return render_template('sql.html')
 
 
 
