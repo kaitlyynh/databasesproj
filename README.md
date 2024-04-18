@@ -1,2 +1,0 @@
-# databasesproj
-Testing database project
