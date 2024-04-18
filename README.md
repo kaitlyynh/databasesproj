@@ -3,6 +3,7 @@ To run the app, navigate into databasesproj -> appFolder -> run.py
 To execute run.py, either press the Play Button in IDE or do the following in terminal:
 
 export FLASK_DEBUG=1
+
 flask run
 
 
