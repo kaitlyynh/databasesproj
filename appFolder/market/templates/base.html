@@ -24,7 +24,10 @@
                 <a class="nav-link" href="{{ url_for('home_page') }}">Homepage <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('market_page') }}">Get Started</a>
+                <a class="nav-link" href="{{ url_for('officers_page') }}">Officers</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('criminals_page') }}">Criminals</a>
             </li>
         </ul>
           {% if current_user.is_authenticated %}
