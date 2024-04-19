@@ -29,6 +29,8 @@ class LoginForm(FlaskForm):
 
 
 class FullNameForm(FlaskForm):
-    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
-    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    # firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    # lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    firstname = StringField(label="Enter a firstname: ")
+    lastname = StringField(label="Enter a lastname: ")
     submit = SubmitField(label='Begin search for person')

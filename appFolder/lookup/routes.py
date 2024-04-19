@@ -8,7 +8,7 @@ from flask_mysqldb import MySQL
 import mysql.connector
 
 
-mysql = MySQL(app)
+mysqlapp = MySQL(app)
 
 
 @app.route('/')
@@ -74,16 +74,10 @@ def logout_page():
 
 @app.route('/sql')
 def sql_page():
-    # conn = mysql.connect()
-    # # cursor = mysql.connect()
-    # cursor = mysql.get_db().cursor()
-    # # cursor =conn.cursor()
-    # # cursor.execute("SELECT * from criminals")
-    # first_entry = cursor.fetchone()
     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
-    first_entry = 's'
-    # cur = mysql.connection.cursor()
-
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from Criminals")
+    first_entry = cursor.fetchall()
     return render_template('sql.html', first_entry=first_entry)
 
 
