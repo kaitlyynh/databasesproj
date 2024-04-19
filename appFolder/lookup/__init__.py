@@ -12,14 +12,13 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login_page"
 login_manager.login_message_category = "info"
-# Connect to XAMPP Database
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'milestone3'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
-mysql = MySQL()
-mysql.init_app(app)
-# cursor = mysql.get_db().cursor()
-# Connect to XAMPP Database
+# ATTEMPT Connect to XAMPP Database
+
+app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_PASSWORD"] = "2003"
+app.config["MYSQL_DB"] = "milestone3"
+
+# ATTEMPT Connect to XAMPP Database
+
 from lookup import routes
