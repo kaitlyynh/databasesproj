@@ -4,21 +4,25 @@
 {% endblock %}
 
 {% block content %}
-    
+    <!-- <body class="text-center">
+        <div class="container">
+            <button class="btn btn-outline btn-info">Clear Filter</button>
+        </div>
+    </body> -->
     <!-- BEGIN Search Bar-->
     <body class="text-center">
         <div class="container">
             <form method="POST" class="form-signin" style="color:white">
                 <h1>
                 {{ person.hidden_tag() }}
-                    Enter a first name
+                    Enter a an officer first name
                 </h1>
                 <br>
                 {{ person.firstname(class="form-control", placeholder="Enter a name") }}
                 <br>
                 <h1>
                 {{ person.hidden_tag() }}
-                    Enter a last name
+                    Enter a an officers last name
                 </h1>
                 <br>
                 {{ person.lastname(class="form-control", placeholder="Enter a name") }}
@@ -37,32 +41,31 @@
     {{ person.firstname.data }}
     {{ person.lastname.data }}
     <!-- End User Input-->
-
-      <table class="table table-hover table-dark">
+    <!-- Show Officer Queries -->
+    <p> Coldata {{coldata}} data {{data}}</p>
+    <table class="table table-hover table-dark">
         <thead>
-            <tr>
-                <!-- Show some "table" columns. Our table does not exist yet this is fake data -->
-                <th scope="col">ID</th>
-                <th scope="col">Name</th>
-                <th scope="col">Barcode</th>
-                <th scope="col">Price</th>
-                <th scope="col">Options</th>
+            <!-- Display columns of officer table -->
+            <tr> 
+                {% for column in coldata %}
+                    <th scope="col"> {{column[0]}}</th>
+                {% endfor %}
             </tr>
-        </thead>
-        <tbody>
-            <!-- Show table rows / entries (hypotehtical data) -->
-            {% for item in items %}
+            {% for entry in data %}
                 <tr>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.barcode }}</td>
-                    <td>{{ item.price }}$</td>
+                    <td>{{ entry[0] }}</td>
+                    <td>{{ entry[1] }}</td>
+                    <td>{{ entry[2] }}</td>
+                    <td>{{ entry[3] }}</td>
+                    <td>{{ entry[4] }}</td>
+                    <td>{{ entry[5] }}</td>
                     <td>
                         <button class="btn btn-outline btn-info">Get more info</button>
                         <button class="btn btn-outline btn-success">Look up this person</button>
                     </td>
                 </tr>
             {% endfor %}
-        </tbody>
+        </thead>
     </table>
+     <!-- Show Officer Queries -->
 {% endblock %}

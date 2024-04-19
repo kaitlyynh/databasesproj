@@ -1,7 +1,7 @@
 from lookup import app
 from flask import render_template, redirect, url_for, flash
 from lookup.models import Item, User
-from lookup.forms import RegisterForm, LoginForm,  FullNameForm
+from lookup.forms import RegisterForm, LoginForm, FullNameForm, ButtonForm
 from lookup import db
 from flask_login import login_user, logout_user, login_required
 from flask_mysqldb import MySQL
@@ -9,7 +9,8 @@ import mysql.connector
 
 
 mysqlapp = MySQL(app)
-
+conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
+cursor = conn.cursor()
 
 @app.route('/')
 @app.route('/homepage')
@@ -19,18 +20,55 @@ def home_page():
 @app.route('/officers', methods = ['GET', 'POST'])
 @login_required
 def officers_page():
+    conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+
     person = FullNameForm()
-    items = Item.query.all()
-    # if form.validate_on_submit():
-    #     return render_template('officers.html', items=items, form=form)
-    return render_template('officers.html', items=items, person=person)
+    # submitted = ButtonForm()
+    # items = Item.query.all()
+
+    cols = "SHOW COLUMNS FROM Officers"
+    coldata = cursor.execute(cols)
+    colexe = cursor.fetchall()
+    print("PRINT", person.firstname.data and person.lastname.data)
+    if person.firstname.data and person.lastname.data:
+        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
+    elif person.firstname.data and not person.lastname.data:
+        query = f"SELECT * FROM Officers WHERE first LIKE '{person.firstname.data}'"
+    elif not person.firstname.data and person.lastname.data:
+        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}'"
+    else:
+        query = "SELECT * From Officers"
+    print(query)
+    cursor.execute(query)
+    data = cursor.fetchall()
+    # print("Data: ", data)
+    return render_template('officers.html', person=person, data=data, coldata=colexe)
 
 
 @app.route('/criminals', methods = ['GET', 'POST'])
 @login_required
 def criminals_page():
+    conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+
     person = FullNameForm()
-    return render_template('criminals.html', person=person)
+
+    cols = "SHOW COLUMNS FROM Criminals"
+    coldata = cursor.execute(cols)
+    colexe = cursor.fetchall()
+    if person.firstname.data and person.lastname.data:
+        query = f"SELECT * FROM Criminals WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
+    elif person.firstname.data and not person.lastname.data:
+        query = f"SELECT * FROM Criminals WHERE first LIKE '{person.firstname.data}'"
+    elif not person.firstname.data and person.lastname.data:
+        query = f"SELECT * FROM Criminals WHERE last LIKE '{person.lastname.data}'"
+    else:
+        query = "SELECT * From Criminals"
+    
+    cursor.execute(query)
+    data = cursor.fetchall()
+    return render_template('criminals.html', person=person, data=data, coldata=colexe)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():

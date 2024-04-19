@@ -11,14 +11,14 @@
             <form method="POST" class="form-signin" style="color:white">
                 <h1>
                 {{ person.hidden_tag() }}
-                    Enter a first name
+                    Enter a criminals first name
                 </h1>
                 <br>
                 {{ person.firstname(class="form-control", placeholder="Enter a name") }}
                 <br>
                 <h1>
                 {{ person.hidden_tag() }}
-                    Enter a last name
+                    Enter a criminals last name
                 </h1>
                 <br>
                 {{ person.lastname(class="form-control", placeholder="Enter a name") }}
@@ -29,12 +29,43 @@
     
             </form>
         </div>
+        <br/>
+        <!-- BEGIN Display User Input-->
+        {{ person.firstname.data }}
+        {{ person.lastname.data }}
+        <!-- End User Input-->
+        <table class="table table-hover table-dark">
+            <thead>
+                <!-- Display columns of officer table -->
+                <tr> 
+                    {% for column in coldata %}
+                        <th scope="col"> {{column[0]}}</th>
+                    {% endfor %}
+                </tr>
+                {% for entry in data %}
+                    <tr>
+                        <td>{{ entry[0] }}</td>
+                        <td>{{ entry[1] }}</td>
+                        <td>{{ entry[2] }}</td>
+                        <td>{{ entry[3] }}</td>
+                        <td>{{ entry[4] }}</td>
+                        <td>{{ entry[5] }}</td>
+                        <td>{{ entry[6] }}</td>
+                        <td>{{ entry[7] }}</td>
+                        <td>{{ entry[8] }}</td>
+                        <td>{{ entry[9] }}</td>
+
+                        <td>
+                            <button class="btn btn-outline btn-info">Get more info</button>
+                            <button class="btn btn-outline btn-success">Look up this person</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </thead>
+        </table>
     </body>
     <!-- END Search Bar-->
 
-    <!-- BEGIN Display User Input-->
-    {{ person.firstname.data }}
-    {{ person.lastname.data }}
-    <!-- End User Input-->
+    
 
 {% endblock %}
