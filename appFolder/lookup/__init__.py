@@ -13,12 +13,12 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login_page"
 login_manager.login_message_category = "info"
 
-# ATTEMPT Connect to XAMPP Database
+# ATTEMPT Connect to MySQL Workbench Database
 app.config['MYSQL_HOST'] = 'localhost'
 app.config["MYSQL_USER"] = "root"
 app.config["MYSQL_PASSWORD"] = "2003"
 app.config["MYSQL_DB"] = "milestone3"
 
-# ATTEMPT Connect to XAMPP Database
+# ATTEMPT Connect to MySQL Workbench Database
 
 from lookup import routes
