@@ -399,6 +399,14 @@ def update_page():
     updateOfficer = OfficerUpdateForm()
     #Current user is a ".gov" user AKA an admin
     if "@gov.com" in current_user.email_address:
+        #Grant Priveileges
+        cursor.execute("GRANT UPDATE ON milestone3.Officers TO 'username'@'localhost';")
+
+        # Apply changes
+        cursor.execute("FLUSH PRIVILEGES;")
+
+        # Commit changes
+        conn.commit()
         # User has the required email domain, proceed with rendering the page
         if updateOfficer.validate_on_submit():
             print("Ran")
