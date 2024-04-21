@@ -56,13 +56,16 @@
         {{ person.firstname.data }}
         {{ person.lastname.data }}
         <!-- End User Input-->
+        <div class="container">
         <table class="table table-hover table-dark">
             <thead>
                 <!-- Display columns of officer table -->
                 <tr> 
-                    {% for column in coldata %}
-                        <th scope="col"> {{column[0]}}</th>
+
+                    {% for n in range(8) %}
+                        <th scope="col"> {{coldata[n][0]}}</th>
                     {% endfor %}
+                   
                 </tr>
                 {% for entry in data %}
                     <tr>
@@ -74,17 +77,18 @@
                         <td>{{ entry[5] }}</td>
                         <td>{{ entry[6] }}</td>
                         <td>{{ entry[7] }}</td>
-                        <td>{{ entry[8] }}</td>
-                        <td>{{ entry[9] }}</td>
+
 
                         <td>
-                            <button class="btn btn-outline btn-info">Get more info</button>
-                            <button class="btn btn-outline btn-success">Look up this person</button>
+                            <a href="{{ url_for('criminal_info', criminal_id=entry[0]) }}" class="btn btn-info">Get more info</a>
+                            <!-- <button class="btn btn-outline btn-info">Get more info</button>
+                            <button class="btn btn-outline btn-success">Look up this person</button> -->
                         </td>
                     </tr>
                 {% endfor %}
             </thead>
         </table>
+        </div>
     </body>
     <!-- END Search Bar-->
 

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}
+  Criminal Info Page
+{% endblock %}
+{% block content %}
+<div class="container">
+
+
+<h1>Criminal Details: {{ criminal[1] }} {{ criminal[2] }}</h1>
+<div>
+    <h2>Aliases</h2>
+    <ul>
+        {% for alias in aliases %}
+        <li>{{ alias[0] }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Probation Officers</h2>
+    <ul>
+        {% for officer in probation_officers %}
+        <li>ID: {{ officer[0] }}, Name: {{ officer[2] }} {{ officer[1] }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Law Enforcement Officers</h2>
+    <ul>
+        {% for officer in officers %}
+        <li>ID: {{ officer[0] }}, Name: {{ officer[2] }} {{ officer[1] }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Sentences</h2>
+    <ul>
+        {% for sentence in sentences %}
+        <li>Sentence ID: {{ sentence[0] }}, Type: {{ sentence[2] }}, Start Date: {{ sentence[4] }}, End Date: {{ sentence[5] }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Appeals</h2>
+    <ul>
+        {% for appeal in appeals %}
+        <li>Appeal ID: {{ appeal[0] }}, Status: {{ appeal[4] }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Crime Charges</h2>
+    <ul>
+        {% for charge in crime_charges %}
+        <li>Charge ID: {{ charge[0] }}, Status: {{ charge[3] }}, Fine Amount: {{ charge[4] }}</li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+{% endblock %}
