@@ -256,82 +256,97 @@ def add_officer():
     addOfficer = AddAnOfficerForm()
     # print("in here1")
     # print(addOfficer.data)
-    if addOfficer.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
-        new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
-        new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-        query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
-        # cursor.execute(query)
-        # conn.commit()
-        add_to_log(conn, cursor, query)
+    if "@gov.com" in current_user.email_address:
+        if addOfficer.validate_on_submit():
+            print("in here")
+            conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+            cursor = conn.cursor()
+            new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
+            new_officer_id = str(int(cursor.fetchone()[0]) + 1)
+            query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
+            # cursor.execute(query)
+            # conn.commit()
+            add_to_log(conn, cursor, query)
+    
+        return render_template('add_officer.html', addOfficer=addOfficer)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    return render_template('add_officer.html', addOfficer=addOfficer)
+    
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
 @login_required
 def add_criminal():  
     addCriminal = AddACriminalForm()
-    # print("in here1")
-    # print(addOfficer.data)
-    if addCriminal.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
-        new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
-        new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
-        query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
-        cursor.execute(query)
-        conn.commit()
-        add_to_log(conn, cursor, query)
 
-    return render_template('add_criminal.html', addCriminal=addCriminal)
+    if "@gov.com" in current_user.email_address:
+        if addCriminal.validate_on_submit():
+            print("in here")
+            conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+            cursor = conn.cursor()
+            new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
+            new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+            query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
+            cursor.execute(query)
+            conn.commit()
+            add_to_log(conn, cursor, query)
+
+        return render_template('add_criminal.html', addCriminal=addCriminal)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
+
 
 @app.route('/delete_officer/<int:officer_id>', methods=['POST'])
 @login_required
 def delete_officer(officer_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    if "@gov.com" in current_user.email_address:
+        try:
+            cursor.execute("DELETE FROM Crime_officers WHERE Officer_ID = %s", (officer_id,))
+            cursor.execute("DELETE FROM Officers WHERE Officer_ID = %s", (officer_id,))
+            conn.commit()
+        except Exception as e:
+            print("Failed to delete officer:", e)
+            conn.rollback()
+            return "Error deleting officer", 500
+        finally:
+            cursor.close()
+            conn.close()
+    
+        return redirect(url_for('officers_page'))    
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    try:
-        cursor.execute("DELETE FROM Crime_officers WHERE Officer_ID = %s", (officer_id,))
-        cursor.execute("DELETE FROM Officers WHERE Officer_ID = %s", (officer_id,))
-        conn.commit()
-    except Exception as e:
-        print("Failed to delete officer:", e)
-        conn.rollback()
-        return "Error deleting officer", 500
-    finally:
-        cursor.close()
-        conn.close()
 
-    return redirect(url_for('officers_page'))
 
 @app.route('/delete_criminal/<int:criminal_id>', methods=['POST'])
 @login_required
 def delete_criminal(criminal_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    if "@gov.com" in current_user.email_address:
+        try:
+            # Delete associated records from dependent tables
+            cursor.execute("DELETE FROM Crime_charges WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+            cursor.execute("DELETE FROM Appeals WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+            cursor.execute("DELETE FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Crimes WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
+            conn.commit()
+        except Exception as e:
+            print("Failed to delete criminal:", e)
+            conn.rollback()
+            return "Error deleting criminal", 500
+        finally:
+            cursor.close()
+            conn.close()
+    
+        return redirect(url_for('criminals_page'))
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    try:
-        # Delete associated records from dependent tables
-        cursor.execute("DELETE FROM Crime_charges WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
-        cursor.execute("DELETE FROM Appeals WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
-        cursor.execute("DELETE FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Crimes WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
-        conn.commit()
-    except Exception as e:
-        print("Failed to delete criminal:", e)
-        conn.rollback()
-        return "Error deleting criminal", 500
-    finally:
-        cursor.close()
-        conn.close()
-
-    return redirect(url_for('criminals_page'))
 
 @app.route('/cases', methods=['GET', 'POST'])
 @login_required
