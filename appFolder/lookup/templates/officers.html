@@ -4,12 +4,29 @@
 {% endblock %}
 
 {% block content %}
-    <!-- <body class="text-center">
+    <body class="text-center">
         <div class="container">
-            <button class="btn btn-outline btn-info">Clear Filter</button>
+            <br/>
+                <form method="POST" class="form-signin">
+                    <form method="POST" class="form-signin">
+                        <div>{{ addOfficer.submit(class=" btn-lg btn btn-success") }}</div>
+                        <br/>
+                        <div>{{ addOfficer.firstname1(class="form-control", placeholder="Enter an officer firstname to add") }}</div>
+                        <br/>
+                        <div>{{ addOfficer.lastname1(class="form-control", placeholder="Enter an officer lastname to add") }}</div>
+                        <br/>
+            </form>
+                </form>
+                <form method="POST" class="form-signin">
+                            <div>{{ deleteOfficer.submit(class=" btn-lg btn btn-danger") }}</div>
+                            <br/>
+                            <div>{{ deleteOfficer.firstname(class="form-control", placeholder="Enter an officer firstname to delete") }}</div>
+                            <br/>
+                            <div>{{ deleteOfficer.lastname(class="form-control", placeholder="Enter an officer lastname to delete") }}</div>
+                            <br/>
+                </form>
         </div>
-    </body> -->
-    <!-- BEGIN Search Bar-->
+    </body>
     <body class="text-center">
         <div class="container">
             <form method="POST" class="form-signin" style="color:white">

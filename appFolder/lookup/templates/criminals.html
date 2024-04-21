@@ -4,7 +4,29 @@
 {% endblock %}
 
 {% block content %}
-    
+<body class="text-center">
+    <div class="container">
+        <br/>
+            <form method="POST" class="form-signin">
+                <div>{{ addCriminal.submit(class=" btn-lg btn btn-success") }}</div>
+                <br/>
+                <div>{{ addCriminal.firstname(class="form-control", placeholder="Enter an criminal firstname to add") }}</div>
+                <br/>
+                <div>{{ addCriminal.lastname(class="form-control", placeholder="Enter an criminal lastname to add") }}</div>
+                <br/>
+            </form>
+            <form method="POST" class="form-signin">
+                <div>{{ deleteCriminal.submit(class=" btn-lg btn btn-danger") }}</div>
+                <br/>
+                {{ deleteCriminal.hidden_tag() }}
+                <div>{{ deleteCriminal.firstname(class="form-control", placeholder="Enter criminal firstname to delete") }}</div>
+                <br/>
+                {{ deleteCriminal.hidden_tag() }}
+                <div>{{ deleteCriminal.lastname(class="form-control", placeholder="Enter criminal lastname to delete") }}</div>
+                <br/>
+            </form>
+    </div>
+</body>
     <!-- BEGIN Search Bar-->
     <body class="text-center">
         <div class="container">

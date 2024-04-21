@@ -21,18 +21,35 @@ class RegisterForm(FlaskForm):
     password2 = PasswordField(label='Confirm Password:', validators=[EqualTo('password1'), DataRequired()])
     submit = SubmitField(label='Create Account')
 
-class ButtonForm(FlaskForm):
-    pressed = StringField(label='Pressed')
-    submit = SubmitField(label='Press this button')
 
 class ClearLogsButtonForm(FlaskForm):
-    submit = SubmitField(label='Clear Logs')
+    submit = SubmitField(label='Clear Log')
+
+class AddAnOfficerForm(FlaskForm):
+    firstname1 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname1 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    submit = SubmitField(label='Add an Officer to the System')
+
+class AddACriminalForm(FlaskForm):
+    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    submit = SubmitField(label='Add a Criminal to the System')
+
+class DeleteAnOfficerForm(FlaskForm):
+    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    submit = SubmitField(label='Delete an Officer from the System')
+
+class DeleteACriminalForm(FlaskForm):
+    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    submit = SubmitField(label='Delete a Criminal from the System')
+
 
 class LoginForm(FlaskForm):
     username = StringField(label='Username:', validators=[DataRequired()])
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Sign in')
-
 
 class FullNameForm(FlaskForm):
     # firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
