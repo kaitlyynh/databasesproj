@@ -55,15 +55,30 @@ def officers_page():
     # conn.commit()
     #Replaced with add_to_log() helper function
     add_to_log(conn, cursor, query)
-    if (addOfficer.firstname1.data and addOfficer.lastname1.data):
+    if addOfficer.firstname1.data and addOfficer.lastname1.data:
         new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
         new_officer_id = str(int(cursor.fetchone()[0]) + 1)
         print("new:", new_officer_id)
         #We will insert Precinct as '0000' by default
         query = f"INSERT INTO Officers (Officer_ID, First, Last, Precinct) VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '0000')"
         cursor.execute(query)
-        conn.commit()
+        # the line below is commented out to avoid permanent changes. query works!
+        # conn.commit()
         add_to_log(conn, cursor, query)
+    if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
+        #find ID of officer to delete (if they exist), assuming no officers have the same name
+        query = f"SELECT Officer_ID FROM Officers WHERE first LIKE '{deleteOfficer.firstname3.data}' and last LIKE '{deleteOfficer.lastname3.data}'"
+        cursor.execute(query)
+        if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
+            target_id = cursor.fetchone()
+            #set first and last name to 'None' to represent a "fired" employee
+            query = f"UPDATE Officers SET first = 'None', last = 'None' WHERE Officer_ID = {target_id[0]}"
+            cursor.execute(query)
+            # conn.commit()
+            add_to_log(conn, cursor, query)
+        else:
+            query = query + f" failed to execute, Officer {deleteOfficer.firstname3.data} {deleteOfficer.lastname3.data} does not exist"
+            add_to_log(conn, cursor, query)
     return render_template('officers.html', person=person, data=data, coldata=colexe, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
 
 
@@ -97,6 +112,15 @@ def criminals_page():
     # conn.commit()
     #Replaced with add_to_log() helper function
     add_to_log(conn, cursor, query)
+    if (addCriminal.firstname2.data and addCriminal.lastname2.data):
+        new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
+        new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+        print("new:", new_criminal_id)
+        query = f"INSERT INTO Criminals (Criminal_ID, First, Last) VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}')"
+        cursor.execute(query)
+        # the line below is commented out to avoid permanent changes. query works!
+        # conn.commit()
+        add_to_log(conn, cursor, query)
     return render_template('criminals.html', person=person, data=data, coldata=colexe, addCriminal=addCriminal, deleteCriminal=deleteCriminal)
 
 @app.route('/register', methods=['GET', 'POST'])

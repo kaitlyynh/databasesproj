@@ -31,13 +31,13 @@ class AddAnOfficerForm(FlaskForm):
     submit = SubmitField(label='Add an Officer to the System')
 
 class AddACriminalForm(FlaskForm):
-    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
-    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    firstname2 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname2 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
     submit = SubmitField(label='Add a Criminal to the System')
 
 class DeleteAnOfficerForm(FlaskForm):
-    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
-    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    firstname3 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname3 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
     submit = SubmitField(label='Delete an Officer from the System')
 
 class DeleteACriminalForm(FlaskForm):
