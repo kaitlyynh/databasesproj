@@ -34,8 +34,8 @@ def officers_page():
     addOfficer = AddAnOfficerForm()
     deleteOfficer = DeleteAnOfficerForm()
     cols = "SHOW COLUMNS FROM Officers"
-    coldata = cursor.execute(cols)
-    colexe = cursor.fetchall()
+    cursor.execute(cols)
+    coldata = cursor.fetchall()
     # print("PRINT", person.firstname.data and person.lastname.data)
     if person.firstname.data and person.lastname.data:
         query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
@@ -47,13 +47,6 @@ def officers_page():
         query = "SELECT * From Officers"
     cursor.execute(query)
     data = cursor.fetchall()
-    #Replaced with add_to_log() helper function
-    #Add the query that was executed to the logging table
-    # saved_query = query.replace("'", "") #remove conflicting apostrophes
-    # insert_query = (f"INSERT INTO Logs (query_run) VALUES ('{date.today()} at {datetime.now()} executed {saved_query}')")
-    # cursor.execute(insert_query)
-    # conn.commit()
-    #Replaced with add_to_log() helper function
     add_to_log(conn, cursor, query)
     if addOfficer.firstname1.data and addOfficer.lastname1.data:
         new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
@@ -61,8 +54,7 @@ def officers_page():
         print("new:", new_officer_id)
         #We will insert Precinct as '0000' by default
         query = f"INSERT INTO Officers (Officer_ID, First, Last, Precinct) VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '0000')"
-        cursor.execute(query)
-        # the line below is commented out to avoid permanent changes. query works!
+        # cursor.execute(query)
         # conn.commit()
         add_to_log(conn, cursor, query)
     if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
@@ -73,13 +65,13 @@ def officers_page():
             target_id = cursor.fetchone()
             #set first and last name to 'None' to represent a "fired" employee
             query = f"UPDATE Officers SET first = 'None', last = 'None' WHERE Officer_ID = {target_id[0]}"
-            cursor.execute(query)
+            # cursor.execute(query)
             # conn.commit()
             add_to_log(conn, cursor, query)
         else:
             query = query + f" failed to execute, Officer {deleteOfficer.firstname3.data} {deleteOfficer.lastname3.data} does not exist"
             add_to_log(conn, cursor, query)
-    return render_template('officers.html', person=person, data=data, coldata=colexe, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
+    return render_template('officers.html', person=person, data=data, coldata=coldata, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
 
 
 
@@ -105,22 +97,29 @@ def criminals_page():
         query = "SELECT * From Criminals"
     cursor.execute(query)
     data = cursor.fetchall()
-    #Replaced with add_to_log() helper function
-    # saved_query = query.replace("'", "") #remove conflicting apostrophes
-    # insert_query = (f"INSERT INTO Logs (query_run) VALUES ('{date.today()} at {datetime.now()} executed {saved_query}')")
-    # cursor.execute(insert_query)
-    # conn.commit()
-    #Replaced with add_to_log() helper function
     add_to_log(conn, cursor, query)
-    if (addCriminal.firstname2.data and addCriminal.lastname2.data):
+    if addCriminal.firstname2.data and addCriminal.lastname2.data:
         new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
         new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
         print("new:", new_criminal_id)
         query = f"INSERT INTO Criminals (Criminal_ID, First, Last) VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}')"
-        cursor.execute(query)
-        # the line below is commented out to avoid permanent changes. query works!
+        # cursor.execute(query)
         # conn.commit()
         add_to_log(conn, cursor, query)
+    if deleteCriminal.firstname4.data and deleteCriminal.lastname4.data:
+        #find ID of criminal to delete (if they exist), assuming no criminals have the same name
+        query = f"SELECT Criminal_ID FROM Criminals WHERE first LIKE '{deleteCriminal.firstname4.data}' and last LIKE '{deleteCriminal.lastname4.data}'"
+        cursor.execute(query)
+        if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
+            target_id = cursor.fetchone()
+            #set first and last name to 'None' to represent a "fired" employee
+            query = f"UPDATE Criminals SET first = 'None', last = 'None' WHERE Criminal_ID = {target_id[0]}"
+            # cursor.execute(query)
+            # conn.commit()
+            add_to_log(conn, cursor, query)
+        else:
+            query = query + f" failed to execute, Criminal {deleteCriminal.firstname4.data} {deleteCriminal.lastname4.data} does not exist"
+            add_to_log(conn, cursor, query)
     return render_template('criminals.html', person=person, data=data, coldata=colexe, addCriminal=addCriminal, deleteCriminal=deleteCriminal)
 
 @app.route('/register', methods=['GET', 'POST'])

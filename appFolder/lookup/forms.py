@@ -41,8 +41,8 @@ class DeleteAnOfficerForm(FlaskForm):
     submit = SubmitField(label='Delete an Officer from the System')
 
 class DeleteACriminalForm(FlaskForm):
-    firstname = StringField(label="Enter a firstname: ", validators=[DataRequired()])
-    lastname = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    firstname4 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
+    lastname4 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
     submit = SubmitField(label='Delete a Criminal from the System')
 
 
