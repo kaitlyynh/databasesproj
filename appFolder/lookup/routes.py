@@ -184,6 +184,69 @@ def officer_info(officer_id):
 
     return render_template('officer_details.html', officer=officer_details,crimes=crime_details)
 
+from flask import render_template, request, abort
+
+@app.route('/criminal/<int:criminal_id>')
+def criminal_info(criminal_id):
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
+        criminal_details = cursor.fetchone()
+
+        cursor.execute("SELECT Alias FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
+        aliases = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
+        sentences = cursor.fetchall()
+
+        cursor.execute("""
+        SELECT Appeals.* FROM Appeals
+        JOIN Crimes ON Appeals.Crime_ID = Crimes.Crime_ID
+        WHERE Crimes.Criminal_ID = %s;
+        """, (criminal_id,))
+        appeals = cursor.fetchall()
+
+        cursor.execute("""
+        SELECT Crime_charges.* FROM Crime_charges
+        JOIN Crimes ON Crime_charges.Crime_ID = Crimes.Crime_ID
+        WHERE Crimes.Criminal_ID = %s;
+        """, (criminal_id,))
+        crime_charges = cursor.fetchall()
+
+        cursor.execute("""
+        SELECT DISTINCT Prob_officer.Prob_ID, Prob_officer.Last, Prob_officer.First 
+        FROM Prob_officer
+        JOIN Sentences ON Prob_officer.Prob_ID = Sentences.Prob_ID
+        WHERE Sentences.Criminal_ID = %s;
+        """, (criminal_id,))
+        probation_officers = cursor.fetchall()
+
+        cursor.execute("""
+        SELECT DISTINCT Officers.Officer_ID, Officers.Last, Officers.First
+        FROM Officers
+        JOIN Crime_officers ON Officers.Officer_ID = Crime_officers.Officer_ID
+        JOIN Crimes ON Crime_officers.Crime_ID = Crimes.Crime_ID
+        WHERE Crimes.Criminal_ID = %s;
+        """, (criminal_id,))
+        officers = cursor.fetchall()
+
+    except Exception as e:
+        print("Error fetching data:", e)
+        abort(404) 
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template('criminal_info.html', 
+                           criminal=criminal_details, 
+                           aliases=aliases, 
+                           sentences=sentences,
+                           appeals=appeals,
+                           crime_charges=crime_charges,
+                           probation_officers=probation_officers,
+                           officers=officers)
 
 
 
