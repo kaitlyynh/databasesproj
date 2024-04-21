@@ -162,6 +162,7 @@ def logout_page():
     return redirect(url_for("home_page"))
 
 @app.route('/logs', methods=['GET', 'POST'])
+@login_required
 def logs_page():
 
     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
@@ -182,6 +183,7 @@ def logs_page():
 
 #detail pages
 @app.route('/officer/<int:officer_id>')
+@login_required
 def officer_info(officer_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
@@ -207,6 +209,7 @@ def officer_info(officer_id):
 
 
 @app.route('/criminal/<int:criminal_id>')
+@login_required
 def criminal_info(criminal_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
@@ -271,39 +274,37 @@ def criminal_info(criminal_id):
                            officers=officers)
 
 @app.route('/add_officer', methods=['GET', 'POST'])
+@login_required
 def add_officer():  
     addOfficer = AddAnOfficerForm()
-    # print("in here1")
-    # print(addOfficer.data)
-    if addOfficer.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    if addOfficer.validate_on_submit() and addOfficer.status.data in ['A', 'I']:
         new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
         new_officer_id = str(int(cursor.fetchone()[0]) + 1)
         query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
         # cursor.execute(query)
         # conn.commit()
         add_to_log(conn, cursor, query)
-
+    else:
+        add_to_log(conn, cursor, "Adding an officer failed to execute, check params again")
     return render_template('add_officer.html', addOfficer=addOfficer)
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
+@login_required
 def add_criminal():  
     addCriminal = AddACriminalForm()
-    # print("in here1")
-    # print(addOfficer.data)
-    if addCriminal.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    if addCriminal.validate_on_submit() and addCriminal.v_stat.data in ['N', 'Y'] and addCriminal.v_stat.data in ['N', 'Y']:
         new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
         new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
         query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
         cursor.execute(query)
         conn.commit()
         add_to_log(conn, cursor, query)
-
+    else:
+        add_to_log(conn, cursor, "Adding a criminal failed to execute, check params again")
     return render_template('add_criminal.html', addCriminal=addCriminal)
 
 @app.route('/delete_officer/<int:officer_id>', methods=['POST'])
