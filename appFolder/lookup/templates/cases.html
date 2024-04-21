@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}
+  Cases Page
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Search for a Crime Case</h1>
+    <form method="POST" class="form-signin" style="color:white;">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="crime_id">Crime ID:</label>
+            {{ form.crime_id(class="form-control", placeholder="Enter Crime ID") }}
+        </div>
+        {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+    </form>
+    <br>
+    {% if specific_crime %}
+    <div class="crime-details">
+        <h2>Specific Crime Details:</h2>
+        <p><strong>Crime ID:</strong> {{ specific_crime[0] }}</p>
+        <p><strong>Classification:</strong> {{ specific_crime[2] }}</p>
+        <p><strong>Date Charged:</strong> {{ specific_crime[3] }}</p>
+        <p><strong>Status:</strong> {{ specific_crime[4] }}</p>
+        <p><strong>Hearing Date:</strong> {{ specific_crime[5] }}</p>
+        <p><strong>Appeal Cut Date:</strong> {{ specific_crime[6] }}</p>
+    </div>
+    {% elif crimes %}
+    <h2>All Crime Cases:</h2>
+    <table class="table table-hover table-dark">
+        <thead>
+            <tr>
+                {% for column in coldata %}
+                    <th scope="col">{{ column[0] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in crimes %}
+                <tr>
+                    {% for item in entry %}
+                        <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No crime details to display. Please enter a valid Crime ID or view all crimes.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

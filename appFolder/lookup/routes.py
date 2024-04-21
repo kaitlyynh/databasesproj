@@ -349,5 +349,30 @@ def delete_criminal(criminal_id):
 
     return redirect(url_for('criminals_page'))
 
+@app.route('/cases', methods=['GET', 'POST'])
+def cases_page():
+    form = CrimeSearchForm()
+    crimes = None 
+    specific_crime = None
+    coldata = None
 
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    
+    # Always fetch column data for the table headers
+    cursor.execute("SHOW COLUMNS FROM Crimes")
+    coldata = cursor.fetchall()
+
+    if form.validate_on_submit():
+        crime_id = form.crime_id.data
+        cursor.execute("SELECT * FROM Crimes WHERE Crime_ID = %s", (crime_id,))
+        specific_crime = cursor.fetchone()
+    else:
+        cursor.execute("SELECT * FROM Crimes")
+        crimes = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+
+    return render_template('cases.html', form=form, crimes=crimes, specific_crime=specific_crime, coldata=coldata)
 

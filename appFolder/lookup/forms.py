@@ -72,3 +72,7 @@ class FullNameForm(FlaskForm):
     firstname = StringField(label="Enter a firstname: ")
     lastname = StringField(label="Enter a lastname: ")
     submit = SubmitField(label='Begin search for person')
+
+class CrimeSearchForm(FlaskForm):
+    crime_id=StringField(label="Enter a Case ID: ")
+    submit = SubmitField(label='Begin search for case')
