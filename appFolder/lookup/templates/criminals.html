@@ -4,43 +4,76 @@
 {% endblock %}
 
 {% block content %}
-    
-    <!-- BEGIN Search Bar-->
-    <body class="text-center">
-        <div class="container">
-            <form method="POST" class="form-signin" style="color:white">
-                <h1>
-                {{ person.hidden_tag() }}
-                    Enter a criminals first name
-                </h1>
-                <br>
-                {{ person.firstname(class="form-control", placeholder="Enter a name") }}
-                <br>
-                <h1>
-                {{ person.hidden_tag() }}
-                    Enter a criminals last name
-                </h1>
-                <br>
-                {{ person.lastname(class="form-control", placeholder="Enter a name") }}
-                <br>
-    
-    
-                {{ person.submit(class="btn btn-lg btn-block btn-primary") }}
-    
-            </form>
+<body class="left">
+    <div class="container">
+        <div class="row">
+            <!-- Form for adding an criminal -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin">
+                    <h2 class="form-signin-heading">Add Criminal</h2>
+                    <div class="form-group">
+                        {{ addCriminal.firstname2(class="form-control", placeholder="Enter an officer criminal to add") }}
+                    </div>
+                    <div class="form-group">
+                        {{ addCriminal.lastname2(class="form-control", placeholder="Enter an criminal lastname to add") }}
+                    </div>
+                        {{ addCriminal.submit(class="btn btn-lg btn-block btn-success") }}
+                </form>
+            </div>
+
+            <!-- Form for deleting an criminal -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin">
+                    <h2 class="form-signin-heading">Delete Criminal</h2>
+                    <div class="form-group">
+                        {{ deleteCriminal.firstname4(class="form-control", placeholder="Enter an criminal firstname to delete") }}
+                    </div>
+                    <div class="form-group">
+                        {{ deleteCriminal.lastname4(class="form-control", placeholder="Enter an criminal lastname to delete") }}
+                    </div>
+                    {{ deleteCriminal.submit(class="btn btn-lg btn-block btn-danger") }}
+                </form>
+            </div>
         </div>
+    </div>
+</body>
+    <!-- BEGIN Search Bar-->
+    <div class="container">
+        <form method="POST" class="form-signin" style="color: white;">
+            {{ person.hidden_tag() }}
+    
+            <h1 class="mb-4">Search for a Criminal </h1>
+    
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                {{ person.firstname(class="form-control", placeholder="Enter first name") }}
+            </div>
+    
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                {{ person.lastname(class="form-control", placeholder="Enter last name") }}
+            </div>
+    
+            {{ person.submit(class="btn btn-lg btn-block btn-primary") }}
+        </form>
+    </div>
         <br/>
         <!-- BEGIN Display User Input-->
-        {{ person.firstname.data }}
-        {{ person.lastname.data }}
+        <div class="text-center">
+            {{ person.firstname.data }}
+            {{ person.lastname.data }}
+        </div>
         <!-- End User Input-->
+        <div class="container">
         <table class="table table-hover table-dark">
             <thead>
                 <!-- Display columns of officer table -->
                 <tr> 
-                    {% for column in coldata %}
-                        <th scope="col"> {{column[0]}}</th>
+
+                    {% for n in range(8) %}
+                        <th scope="col"> {{coldata[n][0]}}</th>
                     {% endfor %}
+                   
                 </tr>
                 {% for entry in data %}
                     <tr>
@@ -52,16 +85,18 @@
                         <td>{{ entry[5] }}</td>
                         <td>{{ entry[6] }}</td>
                         <td>{{ entry[7] }}</td>
-                        <td>{{ entry[8] }}</td>
-                        <td>{{ entry[9] }}</td>
+
 
                         <td>
                             <a href="{{ url_for('criminal_info', criminal_id=entry[0]) }}" class="btn btn-info">Get more info</a>
+                            <!-- <button class="btn btn-outline btn-info">Get more info</button>
+                            <button class="btn btn-outline btn-success">Look up this person</button> -->
                         </td>
                     </tr>
                 {% endfor %}
             </thead>
         </table>
+        </div>
     </body>
     <!-- END Search Bar-->
 

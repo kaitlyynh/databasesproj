@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
-
+{% block title %}
+  Criminal Info Page
+{% endblock %}
 {% block content %}
+<div class="container">
+
+
 <h1>Criminal Details: {{ criminal[1] }} {{ criminal[2] }}</h1>
 <div>
     <h2>Aliases</h2>
@@ -44,5 +49,6 @@
         <li>Charge ID: {{ charge[0] }}, Status: {{ charge[3] }}, Fine Amount: {{ charge[4] }}</li>
         {% endfor %}
     </ul>
+</div>
 </div>
 {% endblock %}

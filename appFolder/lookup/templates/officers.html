@@ -4,33 +4,59 @@
 {% endblock %}
 
 {% block content %}
-    <!-- <body class="text-center">
+    <!-- Attempt-->
+    <!-- Attempt-->
+    <body class="left">
         <div class="container">
-            <button class="btn btn-outline btn-info">Clear Filter</button>
+            <div class="row">
+                <!-- Form for adding an officer -->
+                <div class="col-md-6">
+                    <form method="POST" class="form-signin">
+                        <h2 class="form-signin-heading">Add Officer</h2>
+                        <div class="form-group">
+                            {{ addOfficer.firstname1(class="form-control", placeholder="Enter an officer firstname to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addOfficer.lastname1(class="form-control", placeholder="Enter an officer lastname to add") }}
+                        </div>
+                            {{ addOfficer.submit(class="btn btn-lg btn-block btn-success") }}
+                    </form>
+                </div>
+    
+                <!-- Form for deleting an officer -->
+                <div class="col-md-6">
+                    <form method="POST" class="form-signin">
+                        <h2 class="form-signin-heading">Delete Officer</h2>
+                        <div class="form-group">
+                            {{ deleteOfficer.firstname3(class="form-control", placeholder="Enter an officer firstname to delete") }}
+                        </div>
+                        <div class="form-group">
+                            {{ deleteOfficer.lastname3(class="form-control", placeholder="Enter an officer lastname to delete") }}
+                        </div>
+                        {{ deleteOfficer.submit(class="btn btn-lg btn-block btn-danger") }}
+                    </form>
+                </div>
+            </div>
         </div>
-    </body> -->
-    <!-- BEGIN Search Bar-->
+    </body>
     <body class="text-center">
         <div class="container">
-            <form method="POST" class="form-signin" style="color:white">
-                <h1>
+            <form method="POST" class="form-signin" style="color: white;">
                 {{ person.hidden_tag() }}
-                    Enter officer first name
-                </h1>
-                <br>
-                {{ person.firstname(class="form-control", placeholder="Enter a name") }}
-                <br>
-                <h1>
-                {{ person.hidden_tag() }}
-                    Enter officers last name
-                </h1>
-                <br>
-                {{ person.lastname(class="form-control", placeholder="Enter a name") }}
-                <br>
-    
-    
+        
+                <h1 class="mb-4">Search for an Officer </h1>
+        
+                <div class="form-group">
+                    <label for="firstname">First Name:</label>
+                    {{ person.firstname(class="form-control", placeholder="Enter first name") }}
+                </div>
+        
+                <div class="form-group">
+                    <label for="lastname">Last Name:</label>
+                    {{ person.lastname(class="form-control", placeholder="Enter last name") }}
+                </div>
+        
                 {{ person.submit(class="btn btn-lg btn-block btn-primary") }}
-    
             </form>
         </div>
     </body>
@@ -38,27 +64,29 @@
     <!-- END Search Bar-->
 
     <!-- BEGIN Display User Input-->
-    {{ person.firstname.data }}
-    {{ person.lastname.data }}
+    <div class="text-center">
+        {{ person.firstname.data }}
+        {{ person.lastname.data }}
+    </div>
+
+
     <!-- End User Input-->
     <!-- Show Officer Queries -->
-    <!-- <p> Coldata {{coldata}} data {{data}}</p> -->
+    <div class="container">
     <table class="table table-hover table-dark">
         <thead>
             <!-- Display columns of officer table -->
             <tr> 
-                {% for column in coldata %}
-                    <th scope="col"> {{column[0]}}</th>
-                {% endfor %}
+                    <th scope="col"> {{coldata[0][0]}}</th>
+                    <th scope="col"> {{coldata[1][0]}}</th>
+                    <th scope="col"> {{coldata[2][0]}}</th>
+                    <th scope="col"> Details </th>
             </tr>
             {% for entry in data %}
                 <tr>
                     <td>{{ entry[0] }}</td>
                     <td>{{ entry[1] }}</td>
                     <td>{{ entry[2] }}</td>
-                    <td>{{ entry[3] }}</td>
-                    <td>{{ entry[4] }}</td>
-                    <td>{{ entry[5] }}</td>
                     <td>
                         <a href="{{ url_for('officer_info', officer_id=entry[0]) }}" class="btn btn-outline btn-info">Get more info</a>
                     </td>
@@ -66,5 +94,6 @@
             {% endfor %}
         </thead>
     </table>
+    </div>  
      <!-- Show Officer Queries -->
 {% endblock %}
