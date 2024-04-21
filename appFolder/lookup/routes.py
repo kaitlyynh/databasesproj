@@ -35,7 +35,6 @@ def officers_page():
     cols = "SHOW COLUMNS FROM Officers"
     cursor.execute(cols)
     coldata = cursor.fetchall()
-    # print("PRINT", person.firstname.data and person.lastname.data)
     if person.firstname.data and person.lastname.data:
         query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
     elif person.firstname.data and not person.lastname.data:
@@ -181,7 +180,7 @@ def logs_page():
     logs = cursor.fetchall()
     return render_template('logs.html', logs=logs, clear_logs_button=clear_logs_button)
 
-#Anastasia Code
+#detail pages
 @app.route('/officer/<int:officer_id>')
 def officer_info(officer_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
