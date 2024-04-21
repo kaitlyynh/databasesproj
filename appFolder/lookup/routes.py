@@ -412,23 +412,35 @@ def update_page():
         conn.commit()
         # User has the required email domain, proceed with rendering the page
         if updateOfficer.validate_on_submit():
+            print("Here 1")
             if updateOfficer.target1.data == 'Status' and updateOfficer.new_data1.data not in ['A', 'I']:
                 updateOfficer.new_data1.data = 'I' #make it inactive by default in case user enters an invalid enum value
             query = f"UPDATE Officers SET {updateOfficer.target1.data} = '{updateOfficer.new_data1.data}' WHERE Officer_ID = {updateOfficer.id1.data}"
-            # print(query)
+            print(query)
             cursor.execute(query)
             conn.commit()
             add_to_log(conn, cursor, query)
         if updateCriminal.validate_on_submit():
-            if updateCriminal.target1.data in ["Violation Status", "Probation Status"]:
-                if updateCriminal.new_data1.data not in ['Y', 'N']: #invalid v / p status response
+            print("Here 2")
+            if updateCriminal.target2.data in ["Violation Status", "Probation Status"]:
+                if updateCriminal.new_data2.data not in ['Y', 'N']: #invalid v / p status response
+                    print("Here 2.5")
                     add_to_log(conn, cursor, query + "failed to execute, check params")
                 else: #valid v / p status response
-                    query = f"UPDATE Officers SET {updateCriminal.target1.data} = '{updateCriminal.new_data1.data}' WHERE Criminal_ID = {updateCriminal.id1.data}"
-                    # print(query)
+                    print("Here 3")
+                    query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
+                    print(query)
                     cursor.execute(query)
                     conn.commit()
                     add_to_log(conn, cursor, query + "failed to execute, check params")
+            else: # not v or p status being edited
+                print("Here 3")
+                query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+
+
         return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
     # User does not have the required email domain, redirect or abort as needed. They can only select to read tables.
     cursor.execute(f"GRANT SELECT ON milestone3.Officers TO '{current_user.username}'@'localhost';")
