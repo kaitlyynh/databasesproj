@@ -76,3 +76,10 @@ class FullNameForm(FlaskForm):
 class CrimeSearchForm(FlaskForm):
     crime_id=StringField(label="Enter a Case ID: ")
     submit = SubmitField(label='Begin search for case')
+
+class OfficerUpdateForm(FlaskForm):
+    id = StringField(label="Enter Officer ID to edit")
+    columns = ['Last', 'First', 'Precinct', 'Badge', 'Phone', 'Status']
+    target = SelectField(label="Pick a column to edit", choices = columns)
+    new_data = StringField(label="Enter data to populate this column with")
+    submit = SubmitField(label="Submit")
