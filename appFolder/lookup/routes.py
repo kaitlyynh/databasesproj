@@ -56,20 +56,20 @@ def officers_page():
     #     # cursor.execute(query)
     #     # conn.commit()
     #     add_to_log(conn, cursor, query)
-    if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
-        #find ID of officer to delete (if they exist), assuming no officers have the same name
-        query = f"SELECT Officer_ID FROM Officers WHERE first LIKE '{deleteOfficer.firstname3.data}' and last LIKE '{deleteOfficer.lastname3.data}'"
-        cursor.execute(query)
-        if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
-            target_id = cursor.fetchone()
-            #set first and last name to 'None' to represent a "fired" employee
-            query = f"UPDATE Officers SET first = 'None', last = 'None' WHERE Officer_ID = {target_id[0]}"
-            # cursor.execute(query)
-            # conn.commit()
-            add_to_log(conn, cursor, query)
-        else:
-            query = query + f" failed to execute, Officer {deleteOfficer.firstname3.data} {deleteOfficer.lastname3.data} does not exist"
-            add_to_log(conn, cursor, query)
+    # if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
+    #     #find ID of officer to delete (if they exist), assuming no officers have the same name
+    #     query = f"SELECT Officer_ID FROM Officers WHERE first LIKE '{deleteOfficer.firstname3.data}' and last LIKE '{deleteOfficer.lastname3.data}'"
+    #     cursor.execute(query)
+    #     if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
+    #         target_id = cursor.fetchone()
+    #         #set first and last name to 'None' to represent a "fired" employee
+    #         query = f"UPDATE Officers SET first = 'None', last = 'None' WHERE Officer_ID = {target_id[0]}"
+    #         # cursor.execute(query)
+    #         # conn.commit()
+    #         add_to_log(conn, cursor, query)
+    #     else:
+    #         query = query + f" failed to execute, Officer {deleteOfficer.firstname3.data} {deleteOfficer.lastname3.data} does not exist"
+    #         add_to_log(conn, cursor, query)
     return render_template('officers.html', person=person, data=data, coldata=coldata, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
 
 
@@ -305,5 +305,25 @@ def add_criminal():
         add_to_log(conn, cursor, query)
 
     return render_template('add_criminal.html', addCriminal=addCriminal)
+
+@app.route('/delete_officer/<int:officer_id>', methods=['POST'])
+def delete_officer(officer_id):
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM Crime_officers WHERE Officer_ID = %s", (officer_id,))
+        cursor.execute("DELETE FROM Officers WHERE Officer_ID = %s", (officer_id,))
+        conn.commit()
+    except Exception as e:
+        print("Failed to delete officer:", e)
+        conn.rollback()
+        return "Error deleting officer", 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('officers_page'))
+
 
 
