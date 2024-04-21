@@ -4,57 +4,65 @@
 {% endblock %}
 
 {% block content %}
-<body class="text-center">
+<body class="left">
     <div class="container">
-        <br/>
-            <form method="POST" class="form-signin">
-                <div>{{ addCriminal.submit(class=" btn-lg btn btn-success") }}</div>
-                <br/>
-                <div>{{ addCriminal.firstname2(class="form-control", placeholder="Enter an criminal firstname to add") }}</div>
-                <br/>
-                <div>{{ addCriminal.lastname2(class="form-control", placeholder="Enter an criminal lastname to add") }}</div>
-                <br/>
-            </form>
-            <form method="POST" class="form-signin">
-                <div>{{ deleteCriminal.submit(class=" btn-lg btn btn-danger") }}</div>
-                <br/>
-                {{ deleteCriminal.hidden_tag() }}
-                <div>{{ deleteCriminal.firstname4(class="form-control", placeholder="Enter criminal firstname to delete") }}</div>
-                <br/>
-                {{ deleteCriminal.hidden_tag() }}
-                <div>{{ deleteCriminal.lastname4(class="form-control", placeholder="Enter criminal lastname to delete") }}</div>
-                <br/>
-            </form>
+        <div class="row">
+            <!-- Form for adding an criminal -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin">
+                    <h2 class="form-signin-heading">Add Criminal</h2>
+                    <div class="form-group">
+                        {{ addCriminal.firstname2(class="form-control", placeholder="Enter an officer firstname to add") }}
+                    </div>
+                    <div class="form-group">
+                        {{ addCriminal.lastname2(class="form-control", placeholder="Enter an officer lastname to add") }}
+                    </div>
+                        {{ addCriminal.submit(class="btn btn-lg btn-block btn-success") }}
+                </form>
+            </div>
+
+            <!-- Form for deleting an criminal -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin">
+                    <h2 class="form-signin-heading">Delete Criminal</h2>
+                    <div class="form-group">
+                        {{ deleteCriminal.firstname4(class="form-control", placeholder="Enter an officer firstname to delete") }}
+                    </div>
+                    <div class="form-group">
+                        {{ deleteCriminal.lastname4(class="form-control", placeholder="Enter an officer lastname to delete") }}
+                    </div>
+                    {{ deleteCriminal.submit(class="btn btn-lg btn-block btn-danger") }}
+                </form>
+            </div>
+        </div>
     </div>
 </body>
     <!-- BEGIN Search Bar-->
-    <body class="text-center">
-        <div class="container">
-            <form method="POST" class="form-signin" style="color:white">
-                <h1>
-                {{ person.hidden_tag() }}
-                    Enter a criminals first name
-                </h1>
-                <br>
-                {{ person.firstname(class="form-control", placeholder="Enter a name") }}
-                <br>
-                <h1>
-                {{ person.hidden_tag() }}
-                    Enter a criminals last name
-                </h1>
-                <br>
-                {{ person.lastname(class="form-control", placeholder="Enter a name") }}
-                <br>
+    <div class="container">
+        <form method="POST" class="form-signin" style="color: white;">
+            {{ person.hidden_tag() }}
     
+            <h1 class="mb-4">Search for a Criminal </h1>
     
-                {{ person.submit(class="btn btn-lg btn-block btn-primary") }}
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                {{ person.firstname(class="form-control", placeholder="Enter first name") }}
+            </div>
     
-            </form>
-        </div>
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                {{ person.lastname(class="form-control", placeholder="Enter last name") }}
+            </div>
+    
+            {{ person.submit(class="btn btn-lg btn-block btn-primary") }}
+        </form>
+    </div>
         <br/>
         <!-- BEGIN Display User Input-->
-        {{ person.firstname.data }}
-        {{ person.lastname.data }}
+        <div class="text-center">
+            {{ person.firstname.data }}
+            {{ person.lastname.data }}
+        </div>
         <!-- End User Input-->
         <div class="container">
         <table class="table table-hover table-dark">
