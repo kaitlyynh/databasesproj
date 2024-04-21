@@ -30,6 +30,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logs_page') }}">Logs</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('update_page') }}">Make an Update</a>
+            </li>
         </ul>
           {% if current_user.is_authenticated %}
             <ul class="navbar-nav">

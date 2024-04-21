@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError
 from lookup.models import User
 
@@ -72,3 +72,11 @@ class FullNameForm(FlaskForm):
     firstname = StringField(label="Enter a firstname: ")
     lastname = StringField(label="Enter a lastname: ")
     submit = SubmitField(label='Begin search for person')
+
+
+class OfficerUpdateForm(FlaskForm):
+    id = StringField(label="Enter Officer ID to edit")
+    columns = ['Last', 'First', 'Precinct', 'Badge', 'Phone', 'Status']
+    target = SelectField(label="Pick a column to edit", choices = columns)
+    new_data = StringField(label="Enter data to populate this column with")
+    submit = SubmitField(label="Submit")
