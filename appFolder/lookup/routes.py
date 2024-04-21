@@ -325,5 +325,29 @@ def delete_officer(officer_id):
 
     return redirect(url_for('officers_page'))
 
+@app.route('/delete_criminal/<int:criminal_id>', methods=['POST'])
+def delete_criminal(criminal_id):
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+
+    try:
+        # Delete associated records from dependent tables
+        cursor.execute("DELETE FROM Crime_charges WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+        cursor.execute("DELETE FROM Appeals WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+        cursor.execute("DELETE FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
+        cursor.execute("DELETE FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
+        cursor.execute("DELETE FROM Crimes WHERE Criminal_ID = %s", (criminal_id,))
+        cursor.execute("DELETE FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
+        conn.commit()
+    except Exception as e:
+        print("Failed to delete criminal:", e)
+        conn.rollback()
+        return "Error deleting criminal", 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('criminals_page'))
+
 
 
