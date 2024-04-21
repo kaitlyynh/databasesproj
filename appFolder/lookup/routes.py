@@ -400,7 +400,7 @@ def update_page():
     #Current user is a ".gov" user AKA an admin
     if "@gov.com" in current_user.email_address:
         #Grant Priveileges
-        cursor.execute("GRANT UPDATE ON milestone3.Officers TO 'username'@'localhost';")
+        cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost';")
 
         # Apply changes
         cursor.execute("FLUSH PRIVILEGES;")
@@ -419,6 +419,13 @@ def update_page():
             add_to_log(conn, cursor, query)
         return render_template("update.html", updateOfficer=updateOfficer)
     # User does not have the required email domain, redirect or abort as needed
+    cursor.execute(f"GRANT SELECT ON milestone3.Officers TO '{current_user.username}'@'localhost';")
+
+    # Apply changes
+    cursor.execute("FLUSH PRIVILEGES;")
+
+    # Commit changes
+    conn.commit()
     flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
     return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
