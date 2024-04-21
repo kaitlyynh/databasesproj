@@ -391,3 +391,27 @@ def probation_officer_info(prob_id):
 
     return render_template('probation_officer_info.html', officer=officer_details)
 
+@app.route('/update', methods=['GET', 'POST'])
+@login_required
+def update_page():  
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    updateOfficer = OfficerUpdateForm()
+    #Current user is a ".gov" user AKA an admin
+    if "@gov.com" == current_user.email_address[-8:]:
+        # User has the required email domain, proceed with rendering the page
+        if updateOfficer.validate_on_submit():
+            print("Ran")
+            if updateOfficer.target.data == 'Status' and updateOfficer.new_data.data not in ['A', 'I']:
+                updateOfficer.new_data.data = 'I' #make it inactive by default in case user enters an invalid enum value
+            query = f"UPDATE Officers SET {updateOfficer.target.data} = '{updateOfficer.new_data.data}' WHERE Officer_ID = {updateOfficer.id.data}"
+            print(query)
+            cursor.execute(query)
+            conn.commit()
+            add_to_log(conn, cursor, query)
+        return render_template("update.html", updateOfficer=updateOfficer)
+    else:
+        # User does not have the required email domain, redirect or abort as needed
+        flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+        return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
+
