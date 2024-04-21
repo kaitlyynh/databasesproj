@@ -110,13 +110,13 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-@app.route('/sql')
-def sql_page():
+@app.route('/logs')
+def logs_page():
     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
     cursor.execute("SELECT * from Criminals")
     first_entry = cursor.fetchall()
-    return render_template('sql.html', first_entry=first_entry)
+    return render_template('logs.html', first_entry=first_entry)
 
 
 
