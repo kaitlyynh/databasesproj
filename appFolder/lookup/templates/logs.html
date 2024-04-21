@@ -1,16 +1,43 @@
 {% extends 'base.html' %}
 {% block title %}
-  Criminals Page
+  Admin Query Logging Page
 {% endblock %}
 
 {% block content %}
     
-   
+<body class="text-center">
+    <div class="container">
         <br/>
-        <!-- BEGIN Display User Input-->
-        
-        <!-- End User Input-->
-        
+        <form method="POST" class="form-signin" style="color:white">
+            <h1>
+                    
+                    {{ clear_logs_button.submit(class="btn btn-lg btn-block btn-primary") }}
+            </h1>
+            
+
+        </form>
+    </div>
+    <br/>
+   
+    
+</body>
+        <br/>
+        <table class="table table-hover table-dark">
+            <thead>
+                <!-- Display columns of officer table -->
+                <tr> 
+                        <th scope="col"> Queries executed from LEAST to MOST recent </th>
+                </tr>
+                {% for entry in logs %}
+                    <tr>
+                        <td>{{ entry[0] }}</td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                {% endfor %}
+            </thead>
+        </table>
     </body>
     <!-- END Search Bar-->
 

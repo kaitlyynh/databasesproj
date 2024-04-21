@@ -1,11 +1,12 @@
 from lookup import app
 from flask import render_template, redirect, url_for, flash
 from lookup.models import Item, User
-from lookup.forms import RegisterForm, LoginForm, FullNameForm, ButtonForm
+from lookup.forms import RegisterForm, LoginForm, FullNameForm, ButtonForm, ClearLogsButtonForm
 from lookup import db
 from flask_login import login_user, logout_user, login_required
 from flask_mysqldb import MySQL
 import mysql.connector
+from datetime import datetime
 
 
 mysqlapp = MySQL(app)
@@ -24,8 +25,7 @@ def officers_page():
     cursor = conn.cursor()
 
     person = FullNameForm()
-    # submitted = ButtonForm()
-    # items = Item.query.all()
+    
 
     cols = "SHOW COLUMNS FROM Officers"
     coldata = cursor.execute(cols)
@@ -40,9 +40,16 @@ def officers_page():
     else:
         query = "SELECT * From Officers"
     print(query)
+    
     cursor.execute(query)
     data = cursor.fetchall()
-    # print("Data: ", data)
+    #Add the query that was executed to the logging table
+    now = datetime.now()
+    time_of_execution = now.strftime("%H:%M:%S")
+    saved_query = query.replace("'", "") #remove conflicting apostrophes
+    insert_query = (f"INSERT INTO Logs (query_run) VALUES ('{time_of_execution} executed {saved_query}')")
+    cursor.execute(insert_query)
+    conn.commit()
     return render_template('officers.html', person=person, data=data, coldata=colexe)
 
 
@@ -68,6 +75,12 @@ def criminals_page():
     
     cursor.execute(query)
     data = cursor.fetchall()
+    saved_query = query.replace("'", "") #remove conflicting apostrophes
+    now = datetime.now()
+    time_of_execution = now.strftime("%H:%M:%S")
+    insert_query = (f"INSERT INTO Logs (query_run) VALUES ('{time_of_execution} executed {saved_query}')")
+    cursor.execute(insert_query)
+    conn.commit()
     return render_template('criminals.html', person=person, data=data, coldata=colexe)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -110,13 +123,25 @@ def logout_page():
     flash("You have been logged out!", category='info')
     return redirect(url_for("home_page"))
 
-@app.route('/logs')
+@app.route('/logs', methods=['GET', 'POST'])
 def logs_page():
+
     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
-    cursor.execute("SELECT * from Criminals")
-    first_entry = cursor.fetchall()
-    return render_template('logs.html', first_entry=first_entry)
+    clear_logs_button = ClearLogsButtonForm()
+    #Button was pressed, clear the log table
+    if clear_logs_button.submit.data:
+        print("Clearing tables")
+        query = "DROP TABLE Logs"
+        cursor.execute(query)
+        conn.commit()
+        query = "CREATE TABLE Logs ( query_run VARCHAR(255))"
+        cursor.execute(query)
+        conn.commit()
+    #If button wasn't pressed, log table remains unchanged
+    cursor.execute("SELECT * from Logs")
+    logs = cursor.fetchall()
+    return render_template('logs.html', logs=logs, clear_logs_button=clear_logs_button)
 
 
 
