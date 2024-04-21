@@ -400,10 +400,11 @@ def update_page():
     #Current user is a ".gov" user AKA an admin
     if "@gov.com" in current_user.email_address:
         #Grant Priveileges
-        cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost';")
+
+        cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
 
         # Apply changes
-        cursor.execute("FLUSH PRIVILEGES;")
+        cursor.execute("FLUSH PRIVILEGES")
 
         # Commit changes
         conn.commit()
