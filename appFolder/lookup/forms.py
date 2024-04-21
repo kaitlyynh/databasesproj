@@ -28,11 +28,26 @@ class ClearLogsButtonForm(FlaskForm):
 class AddAnOfficerForm(FlaskForm):
     firstname1 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
     lastname1 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    # precinct = StringField(label="Enter a precinct: ", validators=[DataRequired(), Length(4)])
+    # badge = StringField(label="Enter a badge #: ", validators=[DataRequired(), Length(14)])
+    # phone = StringField(label="Enter a phone #: ", validators=[DataRequired(), Length(10)])
+    # status = StringField(label="Enter a status A/I: ", validators=[DataRequired(), Length(1)])
+    precinct = StringField(label="Enter a precinct: ", validators=[DataRequired()])
+    badge = StringField(label="Enter a badge #: ", validators=[DataRequired()])
+    phone = StringField(label="Enter a phone #: ", validators=[DataRequired()])
+    status = StringField(label="Enter a status A/I: ", validators=[DataRequired()])
     submit = SubmitField(label='Add an Officer to the System')
 
 class AddACriminalForm(FlaskForm):
     firstname2 = StringField(label="Enter a firstname: ", validators=[DataRequired()])
     lastname2 = StringField(label="Enter a lastname: ", validators=[DataRequired()])
+    street = StringField(label="Enter a street: ", validators=[DataRequired()])
+    city = StringField(label="Enter a city: ", validators=[DataRequired()])
+    state = StringField(label="Enter a state: ", validators=[DataRequired()])
+    zip = StringField(label="Enter a zipcode: ", validators=[DataRequired()])
+    phone = StringField(label="Enter a phone #: ", validators=[DataRequired()])
+    v_stat = StringField(label="Enter a violation status: ", validators=[DataRequired()])
+    p_stat = StringField(label="Enter a probation status: ", validators=[DataRequired()])
     submit = SubmitField(label='Add a Criminal to the System')
 
 class DeleteAnOfficerForm(FlaskForm):

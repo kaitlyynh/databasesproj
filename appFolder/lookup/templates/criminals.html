@@ -5,10 +5,18 @@
 
 {% block content %}
 <body class="left">
+    <br/>
     <div class="container">
         <div class="row">
             <!-- Form for adding an criminal -->
-            <div class="col-md-6">
+            <div class="col-md-6 text-center">
+                <a class="btn btn-success"href="{{ url_for('add_criminal') }}">Add a Criminal</a>
+            </div>
+            <div class="col-md-6 text-center">
+                <a class="btn btn-danger"href="{{ url_for('add_criminal') }}">Remove a Criminal (Change URL REdirect)</a>
+            </div>
+            <!-- <div class="col-md-6">
+                
                 <form method="POST" class="form-signin">
                     <h2 class="form-signin-heading">Add Criminal</h2>
                     <div class="form-group">
@@ -18,11 +26,11 @@
                         {{ addCriminal.lastname2(class="form-control", placeholder="Enter an criminal lastname to add") }}
                     </div>
                         {{ addCriminal.submit(class="btn btn-lg btn-block btn-success") }}
-                </form>
+                </form> -->
             </div>
 
             <!-- Form for deleting an criminal -->
-            <div class="col-md-6">
+            <!-- <div class="col-md-6">
                 <form method="POST" class="form-signin">
                     <h2 class="form-signin-heading">Delete Criminal</h2>
                     <div class="form-group">
@@ -33,9 +41,10 @@
                     </div>
                     {{ deleteCriminal.submit(class="btn btn-lg btn-block btn-danger") }}
                 </form>
-            </div>
+            </div> -->
         </div>
     </div>
+    <br/>
 </body>
     <!-- BEGIN Search Bar-->
     <div class="container">

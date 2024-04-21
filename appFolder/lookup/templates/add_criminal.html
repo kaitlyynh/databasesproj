@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}
+  Add Criminal Page
+{% endblock %}
+
+{% block content %}
+    <!-- Attempt-->
+    <!-- Attempt-->
+    <body class="left">
+        <div class="container">
+            <div class="row">
+                <!-- Form for adding an officer -->
+                <div class="col-md-6">
+                    <form method="POST" class="form-signin">
+                        {{ addCriminal.csrf_token }}
+                        <h2 class="form-signin-heading">Add Criminal</h2>
+                        <div class="form-group">
+                            {{ addCriminal.firstname2(class="form-control", placeholder="Enter a criminal firstname to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.lastname2(class="form-control", placeholder="Enter a criminal lastname to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.street(class="form-control", placeholder="Enter a criminal street address to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.city(class="form-control", placeholder="Enter a criminal city to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.state(class="form-control", placeholder="Enter a criminal state  to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.zip(class="form-control", placeholder="Enter a criminal zipcode to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.phone(class="form-control", placeholder="Enter a criminal phone # to add") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.v_stat(class="form-control", placeholder="Enter a criminal violation status to add [N/Y]") }}
+                        </div>
+                        <div class="form-group">
+                            {{ addCriminal.p_stat(class="form-control", placeholder="EEnter a criminal probation status to add [N/Y]") }}
+                        </div>
+                            {{ addCriminal.submit(class="btn btn-lg btn-block btn-success") }}
+                    </form>
+                </div>
+    
+            </div>
+        </div>
+    </body>
+    
+    <br></br>
+    <!-- END Search Bar-->
+
+    <!-- BEGIN Display User Input-->
+   
+
+    <!-- End User Input-->
+    <!-- Show Officer Queries -->
+    
+     <!-- Show Officer Queries -->
+{% endblock %}

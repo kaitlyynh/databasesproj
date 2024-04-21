@@ -47,15 +47,15 @@ def officers_page():
     print(query)
     data = cursor.fetchall()
     add_to_log(conn, cursor, query)
-    if addOfficer.firstname1.data and addOfficer.lastname1.data:
-        new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
-        new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-        print("new:", new_officer_id)
-        #We will insert Precinct as '0000' by default
-        query = f"INSERT INTO Officers (Officer_ID, First, Last, Precinct) VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '0000')"
-        # cursor.execute(query)
-        # conn.commit()
-        add_to_log(conn, cursor, query)
+    # if addOfficer.firstname1.data and addOfficer.lastname1.data:
+    #     new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
+    #     new_officer_id = str(int(cursor.fetchone()[0]) + 1)
+    #     print("new:", new_officer_id)
+    #     #We will insert Precinct as '0000' by default
+    #     query = f"INSERT INTO Officers (Officer_ID, First, Last, Precinct) VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '0000')"
+    #     # cursor.execute(query)
+    #     # conn.commit()
+    #     add_to_log(conn, cursor, query)
     if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
         #find ID of officer to delete (if they exist), assuming no officers have the same name
         query = f"SELECT Officer_ID FROM Officers WHERE first LIKE '{deleteOfficer.firstname3.data}' and last LIKE '{deleteOfficer.lastname3.data}'"
@@ -269,5 +269,41 @@ def criminal_info(criminal_id):
                            crime_charges=crime_charges,
                            probation_officers=probation_officers,
                            officers=officers)
+
+@app.route('/add_officer', methods=['GET', 'POST'])
+def add_officer():  
+    addOfficer = AddAnOfficerForm()
+    # print("in here1")
+    # print(addOfficer.data)
+    if addOfficer.validate_on_submit():
+        print("in here")
+        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+        cursor = conn.cursor()
+        new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
+        new_officer_id = str(int(cursor.fetchone()[0]) + 1)
+        query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
+        # cursor.execute(query)
+        # conn.commit()
+        add_to_log(conn, cursor, query)
+
+    return render_template('add_officer.html', addOfficer=addOfficer)
+
+@app.route('/add_criminal', methods=['GET', 'POST'])
+def add_criminal():  
+    addCriminal = AddACriminalForm()
+    # print("in here1")
+    # print(addOfficer.data)
+    if addCriminal.validate_on_submit():
+        print("in here")
+        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+        cursor = conn.cursor()
+        new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
+        new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+        query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
+        cursor.execute(query)
+        conn.commit()
+        add_to_log(conn, cursor, query)
+
+    return render_template('add_criminal.html', addCriminal=addCriminal)
 
 
