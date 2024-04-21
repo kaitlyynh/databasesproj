@@ -397,11 +397,13 @@ def update_page():
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
     updateOfficer = OfficerUpdateForm()
+    updateCriminal = CriminalUpdateForm()
     #Current user is a ".gov" user AKA an admin
     if "@gov.com" in current_user.email_address:
         #Grant Priveileges
 
         cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
+        cursor.execute(f"GRANT UPDATE ON milestone3.Criminals TO '{current_user.username}'@'localhost'")
 
         # Apply changes
         cursor.execute("FLUSH PRIVILEGES")
@@ -410,16 +412,25 @@ def update_page():
         conn.commit()
         # User has the required email domain, proceed with rendering the page
         if updateOfficer.validate_on_submit():
-            print("Ran")
-            if updateOfficer.target.data == 'Status' and updateOfficer.new_data.data not in ['A', 'I']:
-                updateOfficer.new_data.data = 'I' #make it inactive by default in case user enters an invalid enum value
-            query = f"UPDATE Officers SET {updateOfficer.target.data} = '{updateOfficer.new_data.data}' WHERE Officer_ID = {updateOfficer.id.data}"
-            print(query)
+            if updateOfficer.target1.data == 'Status' and updateOfficer.new_data1.data not in ['A', 'I']:
+                updateOfficer.new_data1.data = 'I' #make it inactive by default in case user enters an invalid enum value
+            query = f"UPDATE Officers SET {updateOfficer.target1.data} = '{updateOfficer.new_data1.data}' WHERE Officer_ID = {updateOfficer.id1.data}"
+            # print(query)
             cursor.execute(query)
             conn.commit()
             add_to_log(conn, cursor, query)
-        return render_template("update.html", updateOfficer=updateOfficer)
-    # User does not have the required email domain, redirect or abort as needed
+        if updateCriminal.validate_on_submit():
+            if updateCriminal.target1.data in ["Violation Status", "Probation Status"]:
+                if updateCriminal.new_data1.data not in ['Y', 'N']: #invalid v / p status response
+                    add_to_log(conn, cursor, query + "failed to execute, check params")
+                else: #valid v / p status response
+                    query = f"UPDATE Officers SET {updateCriminal.target1.data} = '{updateCriminal.new_data1.data}' WHERE Criminal_ID = {updateCriminal.id1.data}"
+                    # print(query)
+                    cursor.execute(query)
+                    conn.commit()
+                    add_to_log(conn, cursor, query + "failed to execute, check params")
+        return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
+    # User does not have the required email domain, redirect or abort as needed. They can only select to read tables.
     cursor.execute(f"GRANT SELECT ON milestone3.Officers TO '{current_user.username}'@'localhost';")
 
     # Apply changes

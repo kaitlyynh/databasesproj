@@ -78,8 +78,15 @@ class CrimeSearchForm(FlaskForm):
     submit = SubmitField(label='Begin search for case')
 
 class OfficerUpdateForm(FlaskForm):
-    id = StringField(label="Enter Officer ID to edit")
-    columns = ['Last', 'First', 'Precinct', 'Badge', 'Phone', 'Status']
-    target = SelectField(label="Pick a column to edit", choices = columns)
-    new_data = StringField(label="Enter data to populate this column with")
-    submit = SubmitField(label="Submit")
+    id1 = StringField(label="Enter Officer ID to edit")
+    columns1 = ['Last', 'First', 'Precinct', 'Badge', 'Phone', 'Status']
+    target1 = SelectField(label="Pick a column to edit", choices = columns1)
+    new_data1 = StringField(label="Enter data to populate this column with")
+    submit1 = SubmitField(label="Submit")
+
+class CriminalUpdateForm(FlaskForm):
+    id2 = StringField(label="Enter Officer ID to edit")
+    columns2 = ['Last', 'First', 'Street', 'City', 'State', 'Zip', 'Phone', 'Violation Status', 'Probation Status']
+    target2 = SelectField(label="Pick a column to edit", choices = columns2)
+    new_data2 = StringField(label="Enter data to populate this column with")
+    submit2 = SubmitField(label="Submit")

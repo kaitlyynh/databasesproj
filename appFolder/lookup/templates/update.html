@@ -1,36 +1,59 @@
 {% extends 'base.html' %}
+
 {% block title %}
     Updating Database Page
 {% endblock %}
+
 {% block content %}
-    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark" style="color:white">
-        <body class="left">
-            <div class="container text-center">
-                <div class="row">
-                    <!-- Form for adding an officer -->
-                    <div class="col-md-6">
-                        <form method="POST" class="form-signin text-center">
-                            {{ updateOfficer.csrf_token }}
-                            <h2 class="form-signin-heading">Edit an Officer</h2>
-                            <div class="form-group">
-                                ID:
-                                {{ updateOfficer.id(class="form-control", placeholder="Enter an ID to change") }}
-                            </div>
-                            <div class="form-group">
-                                Column:
-                                {{ updateOfficer.target(class="form-control", placeholder="Select a field to change") }}
-                            </div>
-                            <div class="form-group">
-                                Data:
-                                {{ updateOfficer.new_data(class="form-control", placeholder="Enter data to populate this column") }}
-                            </div>
-                            <div class="form-group">
-                                {{ updateOfficer.submit(class="form-control btn-success", placeholder="Submit") }}
-                            </div>
+<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark" style="color:white">
+    <div class="container text-center">
+        <div class="row">
+            <!-- Form for adding an officer -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin text-center">
+                    {{ updateOfficer.csrf_token }}
+                    <h2 class="form-signin-heading">Edit an Officer</h2>
+                    <div class="form-group">
+                        ID:
+                        {{ updateOfficer.id(class="form-control", placeholder="Enter an ID to change") }}
                     </div>
-        
-                </div>
+                    <div class="form-group">
+                        Column:
+                        {{ updateOfficer.target(class="form-control", placeholder="Select a field to change") }}
+                    </div>
+                    <div class="form-group">
+                        Data:
+                        {{ updateOfficer.new_data(class="form-control", placeholder="Enter data to populate this column") }}
+                    </div>
+                    <div class="form-group">
+                        {{ updateOfficer.submit(class="form-control btn-success", placeholder="Submit") }}
+                    </div>
+                </form>
             </div>
-        </body>
+            
+            <!-- Form for adding a criminal -->
+            <div class="col-md-6">
+                <form method="POST" class="form-signin text-center">
+                    {{ updateCriminal.csrf_token }}
+                    <h2 class="form-signin-heading">Edit a Criminal</h2>
+                    <div class="form-group">
+                        ID:
+                        {{ updateCriminal.id(class="form-control", placeholder="Enter an ID to change") }}
+                    </div>
+                    <div class="form-group">
+                        Column:
+                        {{ updateCriminal.target(class="form-control", placeholder="Select a field to change") }}
+                    </div>
+                    <div class="form-group">
+                        Data:
+                        {{ updateCriminal.new_data(class="form-control", placeholder="Enter data to populate this column") }}
+                    </div>
+                    <div class="form-group">
+                        {{ updateCriminal.submit(class="form-control btn-success", placeholder="Submit") }}
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 {% endblock %}
