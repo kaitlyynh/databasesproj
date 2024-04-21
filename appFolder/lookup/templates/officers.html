@@ -4,27 +4,27 @@
 {% endblock %}
 
 {% block content %}
-    <body class="text-center">
+    <!-- Attempt-->
+    <!-- Attempt-->
+    <body class="left">
         <div class="container">
             <br/>
-                <form method="POST" class="form-signin">
-                    <form method="POST" class="form-signin">
-                        <div>{{ addOfficer.submit(class=" btn-lg btn btn-success") }}</div>
+            <form method="POST" class="form-signin">
+                <div>{{ addOfficer.submit(class=" btn-lg btn btn-success") }}</div>
+                <br/>
+                <div>{{ addOfficer.firstname1(class="form-control", placeholder="Enter an officer firstname to add") }}</div>
+                <br/>
+                <div>{{ addOfficer.lastname1(class="form-control", placeholder="Enter an officer lastname to add") }}</div>
+                <br/>
+            </form>
+            <form method="POST" class="form-signin">
+                        <div>{{ deleteOfficer.submit(class=" btn-lg btn btn-danger") }}</div>
                         <br/>
-                        <div>{{ addOfficer.firstname1(class="form-control", placeholder="Enter an officer firstname to add") }}</div>
+                        <div>{{ deleteOfficer.firstname3(class="form-control", placeholder="Enter an officer firstname to delete") }}</div>
                         <br/>
-                        <div>{{ addOfficer.lastname1(class="form-control", placeholder="Enter an officer lastname to add") }}</div>
+                        <div>{{ deleteOfficer.lastname3(class="form-control", placeholder="Enter an officer lastname to delete") }}</div>
                         <br/>
             </form>
-                </form>
-                <form method="POST" class="form-signin">
-                            <div>{{ deleteOfficer.submit(class=" btn-lg btn btn-danger") }}</div>
-                            <br/>
-                            <div>{{ deleteOfficer.firstname3(class="form-control", placeholder="Enter an officer firstname to delete") }}</div>
-                            <br/>
-                            <div>{{ deleteOfficer.lastname3(class="form-control", placeholder="Enter an officer lastname to delete") }}</div>
-                            <br/>
-                </form>
         </div>
     </body>
     <body class="text-center">
@@ -55,8 +55,12 @@
     <!-- END Search Bar-->
 
     <!-- BEGIN Display User Input-->
-    {{ person.firstname.data }}
-    {{ person.lastname.data }}
+    <div class="text-center">
+        {{ person.firstname.data }}
+        {{ person.lastname.data }}
+    </div>
+
+
     <!-- End User Input-->
     <!-- Show Officer Queries -->
     <div class="container">

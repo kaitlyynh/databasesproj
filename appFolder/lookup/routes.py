@@ -1,7 +1,6 @@
 from lookup import app
 from flask import render_template, redirect, url_for, flash, request, abort
 from lookup.models import User
-# from lookup.forms import RegisterForm, LoginForm, FullNameForm, ClearLogsButtonForm, AddACriminalForm, AddAnOfficerForm
 from lookup.forms import *
 from lookup import db
 from flask_login import login_user, logout_user, login_required
