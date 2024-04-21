@@ -1,6 +1,6 @@
 from lookup import app
 from flask import render_template, redirect, url_for, flash
-from lookup.models import Item, User
+from lookup.models import User
 from lookup.forms import RegisterForm, LoginForm, FullNameForm, ButtonForm
 from lookup import db
 from flask_login import login_user, logout_user, login_required
@@ -17,33 +17,74 @@ cursor = conn.cursor()
 def home_page():
     return render_template('homepage.html')
 
-@app.route('/officers', methods = ['GET', 'POST'])
+# @app.route('/officers', methods = ['GET', 'POST'])
+# @login_required
+# def officers_page():
+#     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
+#     cursor = conn.cursor()
+
+#     person = FullNameForm()
+#     # submitted = ButtonForm()
+#     # items = Item.query.all()
+
+#     cols = "SHOW COLUMNS FROM Officers"
+#     coldata = cursor.execute(cols)
+#     colexe = cursor.fetchall()
+#     print("PRINT", person.firstname.data and person.lastname.data)
+#     if person.firstname.data and person.lastname.data:
+#         query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
+#     elif person.firstname.data and not person.lastname.data:
+#         query = f"SELECT * FROM Officers WHERE first LIKE '{person.firstname.data}'"
+#     elif not person.firstname.data and person.lastname.data:
+#         query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}'"
+#     else:
+#         query = "SELECT * From Officers"
+#     print(query)
+#     cursor.execute(query)
+#     data = cursor.fetchall()
+#     # print("Data: ", data)
+#     return render_template('officers.html', person=person, data=data, coldata=colexe)
+@app.route('/officers', methods=['GET', 'POST'])
 @login_required
 def officers_page():
-    conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
 
     person = FullNameForm()
-    # submitted = ButtonForm()
-    # items = Item.query.all()
 
+    # Always fetch column data
     cols = "SHOW COLUMNS FROM Officers"
-    coldata = cursor.execute(cols)
-    colexe = cursor.fetchall()
-    print("PRINT", person.firstname.data and person.lastname.data)
-    if person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
-    elif person.firstname.data and not person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE first LIKE '{person.firstname.data}'"
-    elif not person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}'"
+    cursor.execute(cols)
+    coldata = cursor.fetchall()
+
+    # Check if the form has been submitted and is valid
+    if person.validate_on_submit():
+        # Handle form submission
+        conditions = []
+        if person.firstname.data:
+            conditions.append("first LIKE %s")
+        if person.lastname.data:
+            conditions.append("last LIKE %s")
+
+        # Build the query based on conditions
+        if conditions:
+            query = f"SELECT * FROM Officers WHERE {' AND '.join(conditions)}"
+            params = [f"%{person.firstname.data}%", f"%{person.lastname.data}%"] if person.firstname.data and person.lastname.data else [f"%{person.firstname.data or person.lastname.data}%"]
+            cursor.execute(query, params)
+        else:
+            query = "SELECT * FROM Officers"
+            cursor.execute(query)
+        data = cursor.fetchall()
     else:
-        query = "SELECT * From Officers"
-    print(query)
-    cursor.execute(query)
-    data = cursor.fetchall()
-    # print("Data: ", data)
-    return render_template('officers.html', person=person, data=data, coldata=colexe)
+        # Default case when the form is not submitted, show all officers
+        query = "SELECT * FROM Officers"
+        cursor.execute(query)
+        data = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('officers.html', person=person, data=data, coldata=coldata)
 
 
 @app.route('/criminals', methods = ['GET', 'POST'])
@@ -118,7 +159,30 @@ def sql_page():
     first_entry = cursor.fetchall()
     return render_template('sql.html', first_entry=first_entry)
 
+@app.route('/officer/<int:officer_id>')
+def officer_info(officer_id):
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
 
+    query = "SELECT * FROM Officers WHERE Officer_ID = %s"
+    cursor.execute(query, (officer_id,))
+    officer_details = cursor.fetchone()
+
+    crime_query = """
+    SELECT DISTINCT Crime_codes.Code_description
+    FROM Crime_codes
+    JOIN Crime_charges ON Crime_codes.Crime_code = Crime_charges.Crime_code
+    JOIN Crimes ON Crime_charges.Crime_ID = Crimes.Crime_ID
+    JOIN Crime_officers ON Crimes.Crime_ID = Crime_officers.Crime_ID
+    WHERE Crime_officers.Officer_ID = %s;
+    """
+    cursor.execute(crime_query, (officer_id,))
+    crime_details = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('officer_details.html', officer=officer_details,crimes=crime_details)
 
 
 

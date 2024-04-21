@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Officer Details</h1>
+    <p><strong>ID:</strong> {{ officer[0] }}</p>
+    <p><strong>Name:</strong> {{ officer[2] }} {{ officer[1] }}</p>
+    <p><strong>Precinct:</strong> {{ officer[3] }}</p>
+    <p><strong>Badge:</strong> {{ officer[4] }}</p>
+    <p><strong>Phone:</strong> {{ officer[5] }}</p>
+    <p><strong>Status:</strong> {{ officer[6] }}</p>
+
+    <h2>Arrests done with the following crime charges</h2>
+    <ul>
+        {% for crime in crimes %}
+            <li>{{ crime[0] }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
