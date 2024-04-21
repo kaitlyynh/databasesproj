@@ -375,4 +375,19 @@ def cases_page():
     conn.close()
 
     return render_template('cases.html', form=form, crimes=crimes, specific_crime=specific_crime, coldata=coldata)
+@app.route('/probation_officer/<int:prob_id>')
+def probation_officer_info(prob_id):
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT * FROM Prob_officer WHERE Prob_ID = %s", (prob_id,))
+        officer_details = cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+    if not officer_details:
+        return "No probation officer found with ID: {}".format(prob_id), 404
+
+    return render_template('probation_officer_info.html', officer=officer_details)
 

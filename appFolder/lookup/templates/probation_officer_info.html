@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}
+  Probation Officer Details
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Probation Officer Details</h1>
+    <p><strong>ID:</strong> {{ officer[0] }}</p>
+    <p><strong>Name:</strong> {{ officer[2] }} {{ officer[1] }}</p>
+    <p><strong>Address:</strong> {{ officer[3] }}, {{ officer[4] }}, {{ officer[5] }}, {{ officer[6] }}</p>
+    <p><strong>Phone:</strong> {{ officer[7] }}</p>
+    <p><strong>Email:</strong> {{ officer[8] }}</p>
+    <p><strong>Status:</strong> {{ officer[9] }}</p>
+</div>
+{% endblock %}

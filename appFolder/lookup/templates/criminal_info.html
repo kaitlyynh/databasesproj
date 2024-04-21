@@ -18,7 +18,9 @@
     <h2>Probation Officers</h2>
     <ul>
         {% for officer in probation_officers %}
-        <li>ID: {{ officer[0] }}, Name: {{ officer[2] }} {{ officer[1] }}</li>
+        <li>
+            <a href="{{ url_for('probation_officer_info', prob_id=officer[0]) }}">ID: {{ officer[0] }}, Name: {{ officer[2] }} {{ officer[1] }}</a>
+        </li>
         {% endfor %}
     </ul>
 
