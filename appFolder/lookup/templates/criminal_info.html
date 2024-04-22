@@ -52,6 +52,20 @@
         {% endfor %}
     </ul>
 </div>
+<h2>Reduce Punishment</h2>
+<form action="{{ url_for('reduce_punishment') }}" method="POST">
+    <div class="form-group">
+        <label for="appeal_id">Select Appeal:</label>
+        <select name="appeal_id" class="form-control">
+            {% for appeal in appeals %}
+            <option value="{{ appeal[0] }}">{{ appeal[0] }} - Status: {{ appeal[4] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <input type="hidden" name="criminal_id" value="{{ criminal[0] }}">
+    <button type="submit" class="btn btn-warning">Reduce Punishment</button>
+</form>
+
 <form action="{{ url_for('delete_criminal', criminal_id=criminal[0]) }}" method="POST">
     <input type="hidden" name="criminal_id" value="{{ criminal[0] }}">
     <button type="submit" class="btn btn-danger">Delete Criminal</button>

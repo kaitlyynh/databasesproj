@@ -3,9 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mysqldb import MySQL
+from flask_ngrok import run_with_ngrok
 import os
 
 app = Flask(__name__)
+# run_with_ngrok(app)  # Set up ngrok but only activate when app.run() is called
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'market.db')
 app.config['SECRET_KEY'] = 'ec9439cfc6c796ae2029594d'

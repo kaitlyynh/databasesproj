@@ -391,3 +391,22 @@ def probation_officer_info(prob_id):
 
     return render_template('probation_officer_info.html', officer=officer_details)
 
+@app.route('/reduce_punishment', methods=['POST'])
+def reduce_punishment():
+    appeal_id = request.form['appeal_id']
+    if not appeal_id:
+        flash("Appeal ID is missing!", "error")
+        return redirect(url_for('home_page'))
+
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    try:
+        cursor.callproc('ReducePunishment', [int(appeal_id)])
+        conn.commit()
+        flash("Punishment reduced successfully for Appeal ID: " + str(appeal_id), "success")
+    except Exception as e:
+        conn.rollback()
+        flash("Failed to reduce punishment: " + str(e), "error")
+    finally:
+        cursor.close()
+    return redirect(url_for('criminal_info', criminal_id=request.form['criminal_id']))
