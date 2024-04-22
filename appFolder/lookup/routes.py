@@ -44,7 +44,7 @@ def officers_page():
     else:
         query = "SELECT * From Officers"
     cursor.execute(query)
-    print(query)
+    print("Hi there hi there hi there", query)
     data = cursor.fetchall()
     add_to_log(conn, cursor, query)
     return render_template('officers.html', person=person, data=data, coldata=coldata, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
@@ -146,18 +146,20 @@ def logs_page():
     cursor = conn.cursor()
     clear_logs_button = ClearLogsButtonForm()
     #Button was pressed, clear the log table
-    if clear_logs_button.submit.data:
-        query = "DROP TABLE Logs"
-        cursor.execute(query)
-        conn.commit()
-        query = "CREATE TABLE Logs ( query_run VARCHAR(255))"
-        cursor.execute(query)
-        conn.commit()
-    #If button wasn't pressed, log table remains unchanged
-    cursor.execute("SELECT * from Logs")
-    logs = cursor.fetchall()
-    return render_template('logs.html', logs=logs, clear_logs_button=clear_logs_button)
-
+    if "@gov.com" in current_user.email_address:
+        if clear_logs_button.submit.data:
+            query = "DROP TABLE Logs"
+            cursor.execute(query)
+            conn.commit()
+            query = "CREATE TABLE Logs ( query_run VARCHAR(255))"
+            cursor.execute(query)
+            conn.commit()
+        #If button wasn't pressed, log table remains unchanged
+        cursor.execute("SELECT * from Logs")
+        logs = cursor.fetchall()
+        return render_template('logs.html', logs=logs, clear_logs_button=clear_logs_button)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 #detail pages
 @app.route('/officer/<int:officer_id>')
 @login_required
@@ -391,7 +393,7 @@ def probation_officer_info(prob_id):
 
     return render_template('probation_officer_info.html', officer=officer_details)
 
-@app.route('/reduce_punishment', methods=['POST'])
+@app.route('/reduce_punishment', methods=['GET','POST'])
 def reduce_punishment():
     appeal_id = request.form['appeal_id']
     if not appeal_id:
@@ -410,23 +412,23 @@ def reduce_punishment():
     finally:
         cursor.close()
     return redirect(url_for('criminal_info', criminal_id=request.form['criminal_id']))
+
 @app.route('/update', methods=['GET', 'POST'])
 @login_required
 def update_page():  
+    
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    # cursor.execute(f"GRANT CREATE USER ON *.* TO 'root'@'localhost'")
     updateOfficer = OfficerUpdateForm()
     updateCriminal = CriminalUpdateForm()
     #Current user is a ".gov" user AKA an admin
     if "@gov.com" in current_user.email_address:
         #Grant Priveileges
-
-        cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
-        cursor.execute(f"GRANT UPDATE ON milestone3.Criminals TO '{current_user.username}'@'localhost'")
-
+        # cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
+        # cursor.execute(f"GRANT UPDATE ON milestone3.Criminals TO '{current_user.username}'@'localhost'")
         # Apply changes
         cursor.execute("FLUSH PRIVILEGES")
-
         # Commit changes
         conn.commit()
         # User has the required email domain, proceed with rendering the page
@@ -450,7 +452,7 @@ def update_page():
                     query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
                     print(query)
                     cursor.execute(query)
-                    conn.commit()
+                    # conn.commit()
                     add_to_log(conn, cursor, query + "failed to execute, check params")
             else: # not v or p status being edited
                 print("Here 3")
@@ -458,17 +460,10 @@ def update_page():
                 print(query)
                 cursor.execute(query)
                 conn.commit()
-
-
+                add_to_log(conn, cursor, query)
         return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
-    # User does not have the required email domain, redirect or abort as needed. They can only select to read tables.
-    cursor.execute(f"GRANT SELECT ON milestone3.Officers TO '{current_user.username}'@'localhost';")
-
-    # Apply changes
-    cursor.execute("FLUSH PRIVILEGES;")
-
+    # User does not have the required email domain, redirect or abort as needed
     # Commit changes
-    conn.commit()
     flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
     return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
