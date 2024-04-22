@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash, request, abort
 from lookup.models import User
 from lookup.forms import *
 from lookup import db
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from flask_mysqldb import MySQL
 import mysql.connector
 from datetime import datetime, date
@@ -47,29 +47,6 @@ def officers_page():
     print(query)
     data = cursor.fetchall()
     add_to_log(conn, cursor, query)
-    # if addOfficer.firstname1.data and addOfficer.lastname1.data:
-    #     new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
-    #     new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-    #     print("new:", new_officer_id)
-    #     #We will insert Precinct as '0000' by default
-    #     query = f"INSERT INTO Officers (Officer_ID, First, Last, Precinct) VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '0000')"
-    #     # cursor.execute(query)
-    #     # conn.commit()
-    #     add_to_log(conn, cursor, query)
-    # if deleteOfficer.firstname3.data and deleteOfficer.lastname3.data:
-    #     #find ID of officer to delete (if they exist), assuming no officers have the same name
-    #     query = f"SELECT Officer_ID FROM Officers WHERE first LIKE '{deleteOfficer.firstname3.data}' and last LIKE '{deleteOfficer.lastname3.data}'"
-    #     cursor.execute(query)
-    #     if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
-    #         target_id = cursor.fetchone()
-    #         #set first and last name to 'None' to represent a "fired" employee
-    #         query = f"UPDATE Officers SET first = 'None', last = 'None' WHERE Officer_ID = {target_id[0]}"
-    #         # cursor.execute(query)
-    #         # conn.commit()
-    #         add_to_log(conn, cursor, query)
-    #     else:
-    #         query = query + f" failed to execute, Officer {deleteOfficer.firstname3.data} {deleteOfficer.lastname3.data} does not exist"
-    #         add_to_log(conn, cursor, query)
     return render_template('officers.html', person=person, data=data, coldata=coldata, addOfficer=addOfficer, deleteOfficer=deleteOfficer)
 
 
@@ -162,6 +139,7 @@ def logout_page():
     return redirect(url_for("home_page"))
 
 @app.route('/logs', methods=['GET', 'POST'])
+@login_required
 def logs_page():
 
     conn = mysql.connector.connect( user='root', password='2003', host='127.0.0.1', database='milestone3')
@@ -182,6 +160,7 @@ def logs_page():
 
 #detail pages
 @app.route('/officer/<int:officer_id>')
+@login_required
 def officer_info(officer_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
@@ -207,6 +186,7 @@ def officer_info(officer_id):
 
 
 @app.route('/criminal/<int:criminal_id>')
+@login_required
 def criminal_info(criminal_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
@@ -271,85 +251,105 @@ def criminal_info(criminal_id):
                            officers=officers)
 
 @app.route('/add_officer', methods=['GET', 'POST'])
+@login_required
 def add_officer():  
     addOfficer = AddAnOfficerForm()
     # print("in here1")
     # print(addOfficer.data)
-    if addOfficer.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
-        new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
-        new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-        query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
-        # cursor.execute(query)
-        # conn.commit()
-        add_to_log(conn, cursor, query)
+    if "@gov.com" in current_user.email_address:
+        if addOfficer.validate_on_submit():
+            print("in here")
+            conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+            cursor = conn.cursor()
+            new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
+            new_officer_id = str(int(cursor.fetchone()[0]) + 1)
+            query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
+            # cursor.execute(query)
+            # conn.commit()
+            add_to_log(conn, cursor, query)
+    
+        return render_template('add_officer.html', addOfficer=addOfficer)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    return render_template('add_officer.html', addOfficer=addOfficer)
+    
 
 @app.route('/add_criminal', methods=['GET', 'POST'])
+@login_required
 def add_criminal():  
     addCriminal = AddACriminalForm()
-    # print("in here1")
-    # print(addOfficer.data)
-    if addCriminal.validate_on_submit():
-        print("in here")
-        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-        cursor = conn.cursor()
-        new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
-        new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
-        query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
-        cursor.execute(query)
-        conn.commit()
-        add_to_log(conn, cursor, query)
 
-    return render_template('add_criminal.html', addCriminal=addCriminal)
+    if "@gov.com" in current_user.email_address:
+        if addCriminal.validate_on_submit():
+            print("in here")
+            conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+            cursor = conn.cursor()
+            new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
+            new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+            query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
+            cursor.execute(query)
+            conn.commit()
+            add_to_log(conn, cursor, query)
+
+        return render_template('add_criminal.html', addCriminal=addCriminal)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
+
 
 @app.route('/delete_officer/<int:officer_id>', methods=['POST'])
+@login_required
 def delete_officer(officer_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    if "@gov.com" in current_user.email_address:
+        try:
+            cursor.execute("DELETE FROM Crime_officers WHERE Officer_ID = %s", (officer_id,))
+            cursor.execute("DELETE FROM Officers WHERE Officer_ID = %s", (officer_id,))
+            conn.commit()
+        except Exception as e:
+            print("Failed to delete officer:", e)
+            conn.rollback()
+            return "Error deleting officer", 500
+        finally:
+            cursor.close()
+            conn.close()
+    
+        return redirect(url_for('officers_page'))    
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    try:
-        cursor.execute("DELETE FROM Crime_officers WHERE Officer_ID = %s", (officer_id,))
-        cursor.execute("DELETE FROM Officers WHERE Officer_ID = %s", (officer_id,))
-        conn.commit()
-    except Exception as e:
-        print("Failed to delete officer:", e)
-        conn.rollback()
-        return "Error deleting officer", 500
-    finally:
-        cursor.close()
-        conn.close()
 
-    return redirect(url_for('officers_page'))
 
 @app.route('/delete_criminal/<int:criminal_id>', methods=['POST'])
+@login_required
 def delete_criminal(criminal_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    if "@gov.com" in current_user.email_address:
+        try:
+            # Delete associated records from dependent tables
+            cursor.execute("DELETE FROM Crime_charges WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+            cursor.execute("DELETE FROM Appeals WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
+            cursor.execute("DELETE FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Crimes WHERE Criminal_ID = %s", (criminal_id,))
+            cursor.execute("DELETE FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
+            conn.commit()
+        except Exception as e:
+            print("Failed to delete criminal:", e)
+            conn.rollback()
+            return "Error deleting criminal", 500
+        finally:
+            cursor.close()
+            conn.close()
+    
+        return redirect(url_for('criminals_page'))
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    try:
-        # Delete associated records from dependent tables
-        cursor.execute("DELETE FROM Crime_charges WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
-        cursor.execute("DELETE FROM Appeals WHERE Crime_ID IN (SELECT Crime_ID FROM Crimes WHERE Criminal_ID = %s)", (criminal_id,))
-        cursor.execute("DELETE FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Crimes WHERE Criminal_ID = %s", (criminal_id,))
-        cursor.execute("DELETE FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
-        conn.commit()
-    except Exception as e:
-        print("Failed to delete criminal:", e)
-        conn.rollback()
-        return "Error deleting criminal", 500
-    finally:
-        cursor.close()
-        conn.close()
-
-    return redirect(url_for('criminals_page'))
 
 @app.route('/cases', methods=['GET', 'POST'])
+@login_required
 def cases_page():
     form = CrimeSearchForm()
     crimes = None 
@@ -410,3 +410,65 @@ def reduce_punishment():
     finally:
         cursor.close()
     return redirect(url_for('criminal_info', criminal_id=request.form['criminal_id']))
+@app.route('/update', methods=['GET', 'POST'])
+@login_required
+def update_page():  
+    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+    cursor = conn.cursor()
+    updateOfficer = OfficerUpdateForm()
+    updateCriminal = CriminalUpdateForm()
+    #Current user is a ".gov" user AKA an admin
+    if "@gov.com" in current_user.email_address:
+        #Grant Priveileges
+
+        cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
+        cursor.execute(f"GRANT UPDATE ON milestone3.Criminals TO '{current_user.username}'@'localhost'")
+
+        # Apply changes
+        cursor.execute("FLUSH PRIVILEGES")
+
+        # Commit changes
+        conn.commit()
+        # User has the required email domain, proceed with rendering the page
+        if updateOfficer.validate_on_submit():
+            print("Here 1")
+            if updateOfficer.target1.data == 'Status' and updateOfficer.new_data1.data not in ['A', 'I']:
+                updateOfficer.new_data1.data = 'I' #make it inactive by default in case user enters an invalid enum value
+            query = f"UPDATE Officers SET {updateOfficer.target1.data} = '{updateOfficer.new_data1.data}' WHERE Officer_ID = {updateOfficer.id1.data}"
+            print(query)
+            cursor.execute(query)
+            conn.commit()
+            add_to_log(conn, cursor, query)
+        if updateCriminal.validate_on_submit():
+            print("Here 2")
+            if updateCriminal.target2.data in ["Violation Status", "Probation Status"]:
+                if updateCriminal.new_data2.data not in ['Y', 'N']: #invalid v / p status response
+                    print("Here 2.5")
+                    add_to_log(conn, cursor, query + "failed to execute, check params")
+                else: #valid v / p status response
+                    print("Here 3")
+                    query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
+                    print(query)
+                    cursor.execute(query)
+                    conn.commit()
+                    add_to_log(conn, cursor, query + "failed to execute, check params")
+            else: # not v or p status being edited
+                print("Here 3")
+                query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
+                print(query)
+                cursor.execute(query)
+                conn.commit()
+
+
+        return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
+    # User does not have the required email domain, redirect or abort as needed. They can only select to read tables.
+    cursor.execute(f"GRANT SELECT ON milestone3.Officers TO '{current_user.username}'@'localhost';")
+
+    # Apply changes
+    cursor.execute("FLUSH PRIVILEGES;")
+
+    # Commit changes
+    conn.commit()
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
+
