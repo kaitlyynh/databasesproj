@@ -79,8 +79,8 @@ def criminals_page():
         new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
         print("new:", new_criminal_id)
         query = f"INSERT INTO Criminals (Criminal_ID, First, Last) VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}')"
-        # cursor.execute(query)
-        # conn.commit()
+        cursor.execute(query)
+        conn.commit()
         add_to_log(conn, cursor, query)
     if deleteCriminal.firstname4.data and deleteCriminal.lastname4.data:
         #find ID of criminal to delete (if they exist), assuming no criminals have the same name
@@ -90,8 +90,8 @@ def criminals_page():
             target_id = cursor.fetchone()
             #set first and last name to 'None' to represent a "fired" employee
             query = f"UPDATE Criminals SET first = 'None', last = 'None' WHERE Criminal_ID = {target_id[0]}"
-            # cursor.execute(query)
-            # conn.commit()
+            cursor.execute(query)
+            conn.commit()
             add_to_log(conn, cursor, query)
         else:
             query = query + f" failed to execute, Criminal {deleteCriminal.firstname4.data} {deleteCriminal.lastname4.data} does not exist"
@@ -192,65 +192,68 @@ def officer_info(officer_id):
 def criminal_info(criminal_id):
     conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
     cursor = conn.cursor()
+    if "@gov.com" in current_user.email_address:
+        try:
+            cursor.execute("SELECT * FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
+            criminal_details = cursor.fetchone()
 
-    try:
-        cursor.execute("SELECT * FROM Criminals WHERE Criminal_ID = %s", (criminal_id,))
-        criminal_details = cursor.fetchone()
+            cursor.execute("SELECT Alias FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
+            aliases = cursor.fetchall()
 
-        cursor.execute("SELECT Alias FROM Alias WHERE Criminal_ID = %s", (criminal_id,))
-        aliases = cursor.fetchall()
+            cursor.execute("SELECT * FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
+            sentences = cursor.fetchall()
 
-        cursor.execute("SELECT * FROM Sentences WHERE Criminal_ID = %s", (criminal_id,))
-        sentences = cursor.fetchall()
+            cursor.execute("""
+            SELECT Appeals.* FROM Appeals
+            JOIN Crimes ON Appeals.Crime_ID = Crimes.Crime_ID
+            WHERE Crimes.Criminal_ID = %s;
+            """, (criminal_id,))
+            appeals = cursor.fetchall()
 
-        cursor.execute("""
-        SELECT Appeals.* FROM Appeals
-        JOIN Crimes ON Appeals.Crime_ID = Crimes.Crime_ID
-        WHERE Crimes.Criminal_ID = %s;
-        """, (criminal_id,))
-        appeals = cursor.fetchall()
+            cursor.execute("""
+            SELECT Crime_charges.* FROM Crime_charges
+            JOIN Crimes ON Crime_charges.Crime_ID = Crimes.Crime_ID
+            WHERE Crimes.Criminal_ID = %s;
+            """, (criminal_id,))
+            crime_charges = cursor.fetchall()
 
-        cursor.execute("""
-        SELECT Crime_charges.* FROM Crime_charges
-        JOIN Crimes ON Crime_charges.Crime_ID = Crimes.Crime_ID
-        WHERE Crimes.Criminal_ID = %s;
-        """, (criminal_id,))
-        crime_charges = cursor.fetchall()
+            cursor.execute("""
+            SELECT DISTINCT Prob_officer.Prob_ID, Prob_officer.Last, Prob_officer.First 
+            FROM Prob_officer
+            JOIN Sentences ON Prob_officer.Prob_ID = Sentences.Prob_ID
+            WHERE Sentences.Criminal_ID = %s;
+            """, (criminal_id,))
+            probation_officers = cursor.fetchall()
 
-        cursor.execute("""
-        SELECT DISTINCT Prob_officer.Prob_ID, Prob_officer.Last, Prob_officer.First 
-        FROM Prob_officer
-        JOIN Sentences ON Prob_officer.Prob_ID = Sentences.Prob_ID
-        WHERE Sentences.Criminal_ID = %s;
-        """, (criminal_id,))
-        probation_officers = cursor.fetchall()
+            cursor.execute("""
+            SELECT DISTINCT Officers.Officer_ID, Officers.Last, Officers.First
+            FROM Officers
+            JOIN Crime_officers ON Officers.Officer_ID = Crime_officers.Officer_ID
+            JOIN Crimes ON Crime_officers.Crime_ID = Crimes.Crime_ID
+            WHERE Crimes.Criminal_ID = %s;
+            """, (criminal_id,))
+            officers = cursor.fetchall()
 
-        cursor.execute("""
-        SELECT DISTINCT Officers.Officer_ID, Officers.Last, Officers.First
-        FROM Officers
-        JOIN Crime_officers ON Officers.Officer_ID = Crime_officers.Officer_ID
-        JOIN Crimes ON Crime_officers.Crime_ID = Crimes.Crime_ID
-        WHERE Crimes.Criminal_ID = %s;
-        """, (criminal_id,))
-        officers = cursor.fetchall()
+            add_to_log(conn, cursor, "Join statements on Officer/Criminal Relations, Crim ID:" + str(criminal_id))
 
-        add_to_log(conn, cursor, "Join statements on Officer/Criminal Relations, Crim ID:" + str(criminal_id))
+        except Exception as e:
+            print("Error fetching data:", e)
+            abort(404) 
+        finally:
+            cursor.close()
+            conn.close()
 
-    except Exception as e:
-        print("Error fetching data:", e)
-        abort(404) 
-    finally:
-        cursor.close()
-        conn.close()
+        return render_template('criminal_info.html', 
+                            criminal=criminal_details, 
+                            aliases=aliases, 
+                            sentences=sentences,
+                            appeals=appeals,
+                            crime_charges=crime_charges,
+                            probation_officers=probation_officers,
+                            officers=officers)
+    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
 
-    return render_template('criminal_info.html', 
-                           criminal=criminal_details, 
-                           aliases=aliases, 
-                           sentences=sentences,
-                           appeals=appeals,
-                           crime_charges=crime_charges,
-                           probation_officers=probation_officers,
-                           officers=officers)
 
 @app.route('/add_officer', methods=['GET', 'POST'])
 @login_required
@@ -264,10 +267,11 @@ def add_officer():
             conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
             cursor = conn.cursor()
             new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
+            print("precinct: ", addOfficer.precinct.data)
             new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-            query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', {addOfficer.status.data}')"
-            # cursor.execute(query)
-            # conn.commit()
+            query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', '{addOfficer.status.data}')"
+            cursor.execute(query)
+            conn.commit()
             add_to_log(conn, cursor, query)
     
         return render_template('add_officer.html', addOfficer=addOfficer)
@@ -280,15 +284,14 @@ def add_officer():
 @login_required
 def add_criminal():  
     addCriminal = AddACriminalForm()
-
     if "@gov.com" in current_user.email_address:
         if addCriminal.validate_on_submit():
-            print("in here")
             conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
             cursor = conn.cursor()
             new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
             new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
             query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
+            print(query)
             cursor.execute(query)
             conn.commit()
             add_to_log(conn, cursor, query)
@@ -452,7 +455,7 @@ def update_page():
                     query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
                     print(query)
                     cursor.execute(query)
-                    # conn.commit()
+                    conn.commit()
                     add_to_log(conn, cursor, query + "failed to execute, check params")
             else: # not v or p status being edited
                 print("Here 3")

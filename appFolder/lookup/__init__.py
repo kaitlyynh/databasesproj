@@ -10,7 +10,7 @@ app = Flask(__name__)
 # run_with_ngrok(app)  # Set up ngrok but only activate when app.run() is called
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'market.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'info.db')
 app.config['SECRET_KEY'] = 'ec9439cfc6c796ae2029594d'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
