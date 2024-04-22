@@ -441,8 +441,11 @@ def update_page():
                 updateOfficer.new_data1.data = 'I' #make it inactive by default in case user enters an invalid enum value
             query = f"UPDATE Officers SET {updateOfficer.target1.data} = '{updateOfficer.new_data1.data}' WHERE Officer_ID = {updateOfficer.id1.data}"
             print(query)
-            cursor.execute(query)
-            conn.commit()
+            try:
+                cursor.execute(query)
+                conn.commit()
+            except:
+                query = "Update Officers Failed, recheck your params"
             add_to_log(conn, cursor, query)
         if updateCriminal.validate_on_submit():
             print("Here 2")
@@ -454,15 +457,22 @@ def update_page():
                     print("Here 3")
                     query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
                     print(query)
-                    cursor.execute(query)
-                    conn.commit()
-                    add_to_log(conn, cursor, query + "failed to execute, check params")
+                    try:
+                        cursor.execute(query)
+                        conn.commit()
+                    except:
+                        query = "Update Criminals failed to execute, recheck your params"
+                add_to_log(conn, cursor, query + "failed to execute, check params")
+                    
             else: # not v or p status being edited
                 print("Here 3")
                 query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
                 print(query)
-                cursor.execute(query)
-                conn.commit()
+                try:
+                    cursor.execute(query)
+                    conn.commit()
+                except:
+                    query = "Update Criminals failed to execute, recheck your params"
                 add_to_log(conn, cursor, query)
         return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
     # User does not have the required email domain, redirect or abort as needed
