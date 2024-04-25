@@ -15,9 +15,9 @@ class RegisterForm(FlaskForm):
         if email_address:
             raise ValidationError('This email address is taken. Enter a different one.')
 
-    username = StringField(label='User Name:', validators=[Length(min=2, max=30), DataRequired()])
+    username = StringField(label='User Name:', validators=[Length(2,30), DataRequired()])
     email_address = StringField(label='Email Address:', validators=[Email(), DataRequired()])
-    password1 = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])
+    password1 = PasswordField(label='Password:', validators=[Length(1,6), DataRequired()])
     password2 = PasswordField(label='Confirm Password:', validators=[EqualTo('password1'), DataRequired()])
     submit = SubmitField(label='Create Account')
 
@@ -31,7 +31,7 @@ class AddAnOfficerForm(FlaskForm):
     precinct = StringField(label="Enter a precinct: ", validators=[DataRequired(), Length(1,4)])
     badge = StringField(label="Enter a badge #: ", validators=[DataRequired(), Length(1,14)])
     phone = StringField(label="Enter a phone #: ", validators=[DataRequired(), Length(1,10)])
-    status = StringField(label="Enter a status A/I: ", validators=[DataRequired(), Length(1)])
+    status = StringField(label="Enter a status A/I: ", validators=[DataRequired(), Length(1,1)])
     submit = SubmitField(label='Add an Officer to the System')
 
 class AddACriminalForm(FlaskForm):
@@ -39,11 +39,11 @@ class AddACriminalForm(FlaskForm):
     lastname2 = StringField(label="Enter a lastname: ", validators=[DataRequired(), Length(1,15)])
     street = StringField(label="Enter a street: ", validators=[DataRequired(), Length(1,30)])
     city = StringField(label="Enter a city: ", validators=[DataRequired(), Length(1,20)])
-    state = StringField(label="Enter a state: ", validators=[DataRequired(), Length(2)])
-    zip = StringField(label="Enter a zipcode: ", validators=[DataRequired(), Length(5)])
-    phone = StringField(label="Enter a phone #: ", validators=[DataRequired(), Length(10)])
-    v_stat = StringField(label="Enter a violation status N/Y: ", validators=[DataRequired(), Length(1)])
-    p_stat = StringField(label="Enter a probation status N/Y: ", validators=[DataRequired(), Length(1)])
+    state = StringField(label="Enter a state: ", validators=[DataRequired(), Length(1,2)])
+    zip = StringField(label="Enter a zipcode: ", validators=[DataRequired(), Length(1,5)])
+    phone = StringField(label="Enter a phone #: ", validators=[DataRequired(), Length(1,10)])
+    v_stat = StringField(label="Enter a violation status N/Y: ", validators=[DataRequired(), Length(1,1)])
+    p_stat = StringField(label="Enter a probation status N/Y: ", validators=[DataRequired(), Length(1,1)])
     submit = SubmitField(label='Add a Criminal to the System')
 
 class DeleteAnOfficerForm(FlaskForm):

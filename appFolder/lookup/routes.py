@@ -36,14 +36,17 @@ def officers_page():
     cursor.execute(cols)
     coldata = cursor.fetchall()
     if person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
+        query = "SELECT * FROM Officers WHERE last LIKE %s AND first LIKE %s"
+        cursor.execute(query,(person.lastname.data, person.firstname.data))
     elif person.firstname.data and not person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE first LIKE '{person.firstname.data}'"
+        query = "SELECT * FROM Officers WHERE first LIKE %s"
+        cursor.execute(query,(person.firstname.data,))
     elif not person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Officers WHERE last LIKE '{person.lastname.data}'"
+        query = "SELECT * FROM Officers WHERE last LIKE %s"
+        cursor.execute(query,(person.lastname.data,))
     else:
         query = "SELECT * From Officers"
-    cursor.execute(query)
+        cursor.execute(query)
     print("Hi there hi there hi there", query)
     data = cursor.fetchall()
     add_to_log(conn, cursor, query)
@@ -64,38 +67,44 @@ def criminals_page():
     coldata = cursor.execute(cols)
     colexe = cursor.fetchall()
     if person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Criminals WHERE last LIKE '{person.lastname.data}' AND first LIKE '{person.firstname.data}'"
+        query = "SELECT * FROM Criminals WHERE last LIKE %s AND first LIKE %s"
+        cursor.execute(query, (person.lastname.data, person.firstname.data))
     elif person.firstname.data and not person.lastname.data:
-        query = f"SELECT * FROM Criminals WHERE first LIKE '{person.firstname.data}'"
+        query = "SELECT * FROM Criminals WHERE first LIKE %s"
+        cursor.execute(query, (person.firstname.data,))
     elif not person.firstname.data and person.lastname.data:
-        query = f"SELECT * FROM Criminals WHERE last LIKE '{person.lastname.data}'"
+        query = "SELECT * FROM Criminals WHERE last LIKE %s"
+        cursor.execute(query, (person.lastname.data,))
     else:
         query = "SELECT * From Criminals"
-    cursor.execute(query)
+        cursor.execute(query)
     data = cursor.fetchall()
     add_to_log(conn, cursor, query)
-    if addCriminal.firstname2.data and addCriminal.lastname2.data:
-        new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
-        new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
-        print("new:", new_criminal_id)
-        query = f"INSERT INTO Criminals (Criminal_ID, First, Last) VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}')"
-        cursor.execute(query)
-        conn.commit()
-        add_to_log(conn, cursor, query)
-    if deleteCriminal.firstname4.data and deleteCriminal.lastname4.data:
-        #find ID of criminal to delete (if they exist), assuming no criminals have the same name
-        query = f"SELECT Criminal_ID FROM Criminals WHERE first LIKE '{deleteCriminal.firstname4.data}' and last LIKE '{deleteCriminal.lastname4.data}'"
-        cursor.execute(query)
-        if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
-            target_id = cursor.fetchone()
-            #set first and last name to 'None' to represent a "fired" employee
-            query = f"UPDATE Criminals SET first = 'None', last = 'None' WHERE Criminal_ID = {target_id[0]}"
-            cursor.execute(query)
-            conn.commit()
-            add_to_log(conn, cursor, query)
-        else:
-            query = query + f" failed to execute, Criminal {deleteCriminal.firstname4.data} {deleteCriminal.lastname4.data} does not exist"
-            add_to_log(conn, cursor, query)
+    # if addCriminal.firstname2.data and addCriminal.lastname2.data:
+    #     new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
+    #     new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+    #     print("new:", new_criminal_id)
+    #     try:
+    #         query = f"INSERT INTO Criminals (Criminal_ID, First, Last) VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}')"
+    #         cursor.execute(query)
+    #         conn.commit()
+    #         add_to_log(conn, cursor, query)
+    #     except:
+    #         add_to_log(conn, cursor, query + "failed recheck your params")
+    # if deleteCriminal.firstname4.data and deleteCriminal.lastname4.data:
+    #     #find ID of criminal to delete (if they exist), assuming no criminals have the same name
+    #     query = f"SELECT Criminal_ID FROM Criminals WHERE first LIKE '{deleteCriminal.firstname4.data}' and last LIKE '{deleteCriminal.lastname4.data}'"
+    #     cursor.execute(query)
+    #     if cursor.fetchall() != []: #if there was a result (officer to delete exists!)
+    #         target_id = cursor.fetchone()
+    #         #set first and last name to 'None' to represent a "fired" employee
+    #         query = f"UPDATE Criminals SET first = 'None', last = 'None' WHERE Criminal_ID = {target_id[0]}"
+    #         cursor.execute(query)
+    #         conn.commit()
+    #         add_to_log(conn, cursor, query)
+    #     else:
+    #         query = query + f" failed to execute, Criminal {deleteCriminal.firstname4.data} {deleteCriminal.lastname4.data} does not exist"
+    #         add_to_log(conn, cursor, query)
     return render_template('criminals.html', person=person, data=data, coldata=colexe, addCriminal=addCriminal, deleteCriminal=deleteCriminal)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -269,10 +278,14 @@ def add_officer():
             new_officer_id_query = cursor.execute("SELECT MAX(Officer_ID) FROM Officers")
             print("precinct: ", addOfficer.precinct.data)
             new_officer_id = str(int(cursor.fetchone()[0]) + 1)
-            query = f"INSERT INTO Officers VALUES ({(new_officer_id)}, '{addOfficer.firstname1.data}', '{addOfficer.lastname1.data}', '{addOfficer.precinct.data}', '{addOfficer.badge.data}', '{addOfficer.phone.data}', '{addOfficer.status.data}')"
-            cursor.execute(query)
-            conn.commit()
-            add_to_log(conn, cursor, query)
+            try:
+                query = "INSERT INTO Officers VALUES (%s,%s,%s,%s,%s,%s,%s)"
+                params=(new_officer_id, addOfficer.firstname1.data,addOfficer.lastname1.data,addOfficer.precinct.data,addOfficer.badge.data, addOfficer.phone.data,addOfficer.status.data)
+                cursor.execute(query,params)
+                conn.commit()
+                add_to_log(conn, cursor, query)
+            except:
+                add_to_log(conn, cursor, query + "failed to execute, please check your params")
     
         return render_template('add_officer.html', addOfficer=addOfficer)
     flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
@@ -289,12 +302,16 @@ def add_criminal():
             conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
             cursor = conn.cursor()
             new_criminal_id_query = cursor.execute("SELECT MAX(Criminal_ID) FROM Criminals")
-            new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
-            query = f"INSERT INTO Criminals VALUES ({(new_criminal_id)}, '{addCriminal.firstname2.data}', '{addCriminal.lastname2.data}', '{addCriminal.street.data}', '{addCriminal.city.data}', '{addCriminal.state.data}', '{addCriminal.zip.data}', '{addCriminal.phone.data}', '{addCriminal.v_stat.data}', '{addCriminal.p_stat.data}')"
-            print(query)
-            cursor.execute(query)
-            conn.commit()
-            add_to_log(conn, cursor, query)
+            try:
+                new_criminal_id = str(int(cursor.fetchone()[0]) + 1)
+                query = "INSERT INTO Criminals VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                params = (new_criminal_id, addCriminal.firstname2.data, addCriminal.lastname2.data, addCriminal.street.data, addCriminal.city.data, addCriminal.state.data, addCriminal.zip.data, addCriminal.phone.data, addCriminal.v_stat.data, addCriminal.p_stat.data)
+                # print(query)
+                cursor.execute(query,params)
+                conn.commit()
+                add_to_log(conn, cursor, query)
+            except:
+                add_to_log(conn, cursor, query + "failed to execute, please check your params")
 
         return render_template('add_criminal.html', addCriminal=addCriminal)
     flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
@@ -460,9 +477,10 @@ def update_page():
                     try:
                         cursor.execute(query)
                         conn.commit()
+                        add_to_log(conn, cursor, query)
                     except:
                         query = "Update Criminals failed to execute, recheck your params"
-                add_to_log(conn, cursor, query + "failed to execute, check params")
+                        add_to_log(conn, cursor, query + "failed to execute, check params")
                     
             else: # not v or p status being edited
                 print("Here 3")
