@@ -436,65 +436,44 @@ def reduce_punishment():
 @app.route('/update', methods=['GET', 'POST'])
 @login_required
 def update_page():  
-    
-    conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
-    cursor = conn.cursor()
-    # cursor.execute(f"GRANT CREATE USER ON *.* TO 'root'@'localhost'")
     updateOfficer = OfficerUpdateForm()
     updateCriminal = CriminalUpdateForm()
-    #Current user is a ".gov" user AKA an admin
-    if "@gov.com" in current_user.email_address:
-        #Grant Priveileges
-        # cursor.execute(f"GRANT UPDATE ON milestone3.Officers TO '{current_user.username}'@'localhost'")
-        # cursor.execute(f"GRANT UPDATE ON milestone3.Criminals TO '{current_user.username}'@'localhost'")
-        # Apply changes
-        cursor.execute("FLUSH PRIVILEGES")
-        # Commit changes
-        conn.commit()
-        # User has the required email domain, proceed with rendering the page
+
+    if "@gov.com" not in current_user.email_address:
+        flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
+        return redirect(url_for("home_page"))
+
+    try:
+        conn = mysql.connector.connect(user='root', password='2003', host='127.0.0.1', database='milestone3')
+        cursor = conn.cursor()
+
         if updateOfficer.validate_on_submit():
-            print("Here 1")
             if updateOfficer.target1.data == 'Status' and updateOfficer.new_data1.data not in ['A', 'I']:
-                updateOfficer.new_data1.data = 'I' #make it inactive by default in case user enters an invalid enum value
-            query = f"UPDATE Officers SET {updateOfficer.target1.data} = '{updateOfficer.new_data1.data}' WHERE Officer_ID = {updateOfficer.id1.data}"
-            print(query)
-            try:
-                cursor.execute(query)
-                conn.commit()
-            except:
-                query = "Update Officers Failed, recheck your params"
-            add_to_log(conn, cursor, query)
+                updateOfficer.new_data1.data = 'I'  # Default status if invalid
+            query = "UPDATE Officers SET {} = %s WHERE Officer_ID = %s".format(updateOfficer.target1.data)
+            params = (updateOfficer.new_data1.data, updateOfficer.id1.data)
+            cursor.execute(query, params)
+            conn.commit()
+            add_to_log(conn, cursor, query, params)
+
         if updateCriminal.validate_on_submit():
-            print("Here 2")
-            if updateCriminal.target2.data in ["Violation Status", "Probation Status"]:
-                if updateCriminal.new_data2.data not in ['Y', 'N']: #invalid v / p status response
-                    print("Here 2.5")
-                    add_to_log(conn, cursor, query + "failed to execute, check params")
-                else: #valid v / p status response
-                    print("Here 3")
-                    query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
-                    print(query)
-                    try:
-                        cursor.execute(query)
-                        conn.commit()
-                        add_to_log(conn, cursor, query)
-                    except:
-                        query = "Update Criminals failed to execute, recheck your params"
-                        add_to_log(conn, cursor, query + "failed to execute, check params")
-                    
-            else: # not v or p status being edited
-                print("Here 3")
-                query = f"UPDATE Criminals SET {updateCriminal.target2.data} = '{updateCriminal.new_data2.data}' WHERE Criminal_ID = {updateCriminal.id2.data}"
-                print(query)
-                try:
-                    cursor.execute(query)
-                    conn.commit()
-                except:
-                    query = "Update Criminals failed to execute, recheck your params"
-                add_to_log(conn, cursor, query)
-        return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
-    # User does not have the required email domain, redirect or abort as needed
-    # Commit changes
-    flash("You do not have permission to access this page, you do not have .gov in your email address", category='danger')
-    return redirect(url_for("home_page"))  # Redirect to home page or other appropriate action
+            valid_status = ['Y', 'N'] if updateCriminal.target2.data in ["Violation Status", "Probation Status"] else None
+            if valid_status and updateCriminal.new_data2.data not in valid_status:
+                flash("Invalid status update attempted.", category='danger')
+            else:
+                query = "UPDATE Criminals SET {} = %s WHERE Criminal_ID = %s".format(updateCriminal.target2.data)
+                params = (updateCriminal.new_data2.data, updateCriminal.id2.data)
+                cursor.execute(query, params)
+                conn.commit()
+                add_to_log(conn, cursor, query, params)
+
+    except Exception as e:
+        flash(f"Failed to update: {str(e)}", category='danger')
+        conn.rollback()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template("update.html", updateOfficer=updateOfficer, updateCriminal=updateCriminal)
 
